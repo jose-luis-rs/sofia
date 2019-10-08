@@ -45,7 +45,7 @@ R3BSofMwpc2::R3BSofMwpc2(const TString& geoFile, const TGeoTranslation& trans, c
 }
 
 R3BSofMwpc2::R3BSofMwpc2(const TString& geoFile, const TGeoCombiTrans& combi)
-    : R3BDetector("R3BSofMwpc2", kSOFMWPC1, geoFile, combi)
+    : R3BDetector("R3BSofMwpc2", kSOFMWPC2, geoFile, combi)
     , fSofMWPCCollection(new TClonesArray("R3BSofMWPCPoint"))
     , fPosIndex(0)
     , kGeoSaved(kFALSE)
@@ -153,7 +153,7 @@ Bool_t R3BSofMwpc2::ProcessHits(FairVolume* vol)
 
         // Increment number of TraPoints for this track
         R3BStack* stack = (R3BStack*)gMC->GetStack();
-        stack->AddPoint(kSOFMWPC1);
+        stack->AddPoint(kSOFMWPC2);
 
         ResetParameters();
     }

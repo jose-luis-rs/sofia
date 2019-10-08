@@ -45,7 +45,7 @@ R3BSofMwpc0::R3BSofMwpc0(const TString& geoFile, const TGeoTranslation& trans, c
 }
 
 R3BSofMwpc0::R3BSofMwpc0(const TString& geoFile, const TGeoCombiTrans& combi)
-    : R3BDetector("R3BSofMwpc0", kSOFMWPC1, geoFile, combi)
+    : R3BDetector("R3BSofMwpc0", kSOFMWPC0, geoFile, combi)
     , fSofMWPCCollection(new TClonesArray("R3BSofMWPCPoint"))
     , fPosIndex(0)
     , kGeoSaved(kFALSE)
@@ -153,7 +153,7 @@ Bool_t R3BSofMwpc0::ProcessHits(FairVolume* vol)
 
         // Increment number of TraPoints for this track
         R3BStack* stack = (R3BStack*)gMC->GetStack();
-        stack->AddPoint(kSOFMWPC1);
+        stack->AddPoint(kSOFMWPC0);
 
         ResetParameters();
     }
@@ -256,7 +256,7 @@ R3BSofMWPCPoint* R3BSofMwpc0::AddPoint(Int_t trackID,
 Bool_t R3BSofMwpc0::CheckIfSensitive(std::string name)
 {
   if (TString(name).Contains("MWPC0")) {
-    LOG(INFO) << "Found MWPC1 geometry from ROOT file: " << name;
+    LOG(INFO) << "Found MWPC0 geometry from ROOT file: " << name;
     return kTRUE;
   }
     return kFALSE;
