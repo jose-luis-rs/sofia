@@ -26,5 +26,6 @@ add_subdirectory (mwpc1)
 add_subdirectory (mwpc2)
 add_subdirectory (mwpc3)
 add_subdirectory (sofonline)
+add_subdirectory (softracking)
 add_subdirectory (macros)
 
