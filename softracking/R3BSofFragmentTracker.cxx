@@ -27,6 +27,12 @@
 #include "TArc.h"
 #include "TGraphErrors.h"
 #include "TF1.h"
+#include "TLine.h"
+
+
+
+TVector3 v1;
+double c=29.9792458;
 
 using namespace std;
 
@@ -56,6 +62,8 @@ R3BSofFragmentTracker::R3BSofFragmentTracker(const char* name, Bool_t vis, Int_t
     , fFieldPar(NULL)
     , fPropagator(NULL)
     , fArrayMCTracks(NULL)
+    , fhitmwp3(NULL)
+    , fhittof(NULL)
     , fDetectors(new R3BTrackingSetup())
     , fArrayFragments(new TClonesArray("R3BTrackingParticle"))
     , fNEvents(0)
@@ -84,7 +92,10 @@ InitStatus R3BSofFragmentTracker::Init()
         return kERROR;
     }
 
-    man->Register("TrackingParticle", "Tracking", fArrayFragments, kTRUE);
+    fhitmwp3 = (TClonesArray*)man->GetObject("Mwpc3Hit");
+    fhittof = (TClonesArray*)man->GetObject("TofWHit");
+
+   // man->Register("TrackingParticle", "Tracking", fArrayFragments, kTRUE);
 
     if (!InitPropagator())
     {
@@ -92,6 +103,9 @@ InitStatus R3BSofFragmentTracker::Init()
     }
 
     fDetectors->Init();
+
+
+    fh_A_reco2 = new TH1F("h_A_reco", "Reconstructed mass", 200., 30., 50.);
 
  
     return kSUCCESS;
@@ -157,6 +171,37 @@ void R3BSofFragmentTracker::Exec(const Option_t*)
         return;
     }
 
+    Int_t nHits = fhitmwp3->GetEntries();
+    Int_t nHitstof = fhittof->GetEntries();
+
+    for(int i=0;i<nHits;i++){
+    R3BHit* mw3 = (R3BHit*)fhitmwp3->At(i);
+    R3BHit* tof = (R3BHit*)fhittof->At(i);
+
+    if(mw3&&tof&&(nHits==nHitstof)){
+    
+
+    double xx=243.-mw3->GetX()*cos(29.*TMath::DegToRad());
+    double zz =689.+mw3->GetX()*sin(29.*TMath::DegToRad())-163.4;
+    v1.SetXYZ(xx,0.,zz);
+
+    double rho=94.6/(2.*sin(v1.Theta()/2.)*cos(14.*TMath::DegToRad()-v1.Theta()/2.));
+    double brho=4.0*0.8*rho*0.01;
+    double len=65.5+163.4+sqrt(xx*xx+zz*zz)+25.23;
+    double vel=len/tof->GetTime();
+    double beta=vel/c;
+    double gamma=1./sqrt(1.-beta*beta);
+    double aa=brho*18./(3.10716*beta*gamma);
+
+    fh_A_reco2->Fill(aa+0.4);
+
+    std::cout << rho<<" [cm] "<< brho<<" [Tm] "<< len*0.01<<" [m] "<< vel<<" [cm/ns] "<< aa << std::endl;
+   
+    TLine* l1 = new TLine(0, 163.4, 243.-mw3->GetX()*cos(29.*TMath::DegToRad()),689.+mw3->GetX()*sin(29.*TMath::DegToRad()));
+    l1->Draw();
+    }
+
+    }
  
 
     if (0 == (fNEvents % 10))
@@ -171,6 +216,8 @@ void R3BSofFragmentTracker::Exec(const Option_t*)
 void R3BSofFragmentTracker::Finish()
 {
 
+    fh_A_reco2->Write();
+
  if (fVis)
     {
         for (auto const& det : fDetectors->GetArray())
@@ -178,6 +225,13 @@ void R3BSofFragmentTracker::Finish()
             det->Draw();
         }
     }
+
+            TLine* l1 = new TLine(0, -65.5, 0, 163.4);
+            l1->Draw();
+
+
+        new TCanvas("c6", "", 500, 300, 500, 500);
+        fh_A_reco2->Draw();
 
 }
 

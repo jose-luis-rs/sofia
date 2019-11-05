@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <string>
+#include "TVector3.h"
 
 class TClonesArray;
 class R3BFieldPar;
@@ -46,6 +47,8 @@ class R3BSofFragmentTracker : public FairTask
     R3BFieldPar* fFieldPar;
     R3BTPropagator* fPropagator;
     TClonesArray* fArrayMCTracks; // simulation output??? To compare?
+    TClonesArray* fhitmwp3;
+    TClonesArray* fhittof;
     R3BTrackingSetup* fDetectors; // array of R3BTrackingDetector
     std::vector<R3BTrackingParticle*> fFragments;
     TClonesArray* fArrayFragments;

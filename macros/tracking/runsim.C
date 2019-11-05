@@ -272,6 +272,15 @@ void runsim(Int_t nEvents = 0)
         ionGen->SetSpotRadius(0.0, -65.5, 0.);
         primGen->AddGenerator(ionGen);
 
+        // 128-Sn fragment
+        R3BIonGenerator* ionGen1 = new R3BIonGenerator(18, 39, 18, 1, 0., 0., 0.951);
+        ionGen1->SetSpotRadius(0.0, -65.5, 0.);
+        primGen->AddGenerator(ionGen1);
+
+        R3BIonGenerator* ionGen2 = new R3BIonGenerator(18, 36, 18, 1, 0., 0., 0.951);
+        ionGen2->SetSpotRadius(0.0, -65.5, 0.);
+        primGen->AddGenerator(ionGen2);
+
         // neutrons
         FairBoxGenerator* boxGen_n = new FairBoxGenerator(2112, 3);
         boxGen_n->SetThetaRange(theta1, theta2);
