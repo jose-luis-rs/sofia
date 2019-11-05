@@ -28,6 +28,7 @@
 R3BSofMwpcDigitizer::R3BSofMwpcDigitizer()
     : FairTask("R3BSof MWPC Digitization scheme", 1)
     , fName("Mwpc")
+    , fDetId(0)
     , fMCTrack(NULL)
     , fMwpcPoints(NULL)
     , fMwpcHits(NULL)
@@ -43,6 +44,7 @@ R3BSofMwpcDigitizer::R3BSofMwpcDigitizer()
 R3BSofMwpcDigitizer::R3BSofMwpcDigitizer(const TString& name, Int_t iVerbose)
     : FairTask(name + "Digi", iVerbose)
     , fName(name)
+    , fDetId(0)
     , fMCTrack(NULL)
     , fMwpcPoints(NULL)
     , fMwpcHits(NULL)
@@ -78,8 +80,15 @@ InitStatus R3BSofMwpcDigitizer::Init()
     fMwpcPoints = (TClonesArray*)ioman->GetObject("Sof" + fName + "Point");
 
     // Register output array fMwpcHits
-    fMwpcHits = new TClonesArray("R3BSofMwpcHitData", 10);
+    //fMwpcHits = new TClonesArray("R3BSofMwpcHitData", 10);
+    //ioman->Register(fName + "Hit", "Digital response in " + fName, fMwpcHits, kTRUE);
+    fMwpcHits = new TClonesArray("R3BHit", 10);
     ioman->Register(fName + "Hit", "Digital response in " + fName, fMwpcHits, kTRUE);
+
+    if(fName=="Mwpc0")fDetId=0;
+    else if(fName=="Mwpc1")fDetId=2;
+    else if(fName=="Mwpc2")fDetId=4;
+    else if(fName=="Mwpc3")fDetId=5;
 
     return kSUCCESS;
 }
@@ -122,7 +131,8 @@ void R3BSofMwpcDigitizer::Exec(Option_t* opt)
                 gRandom->Gaus(0., fsigma_x);
             ;
 
-            AddHitData(x, y);
+            //AddHitData(x, y);
+            AddR3BHitData(fDetId, x, y, 0., 0.);
         }
     }
     if (pointData)
@@ -148,6 +158,15 @@ R3BSofMwpcHitData* R3BSofMwpcDigitizer::AddHitData(Double_t x, Double_t y)
     TClonesArray& clref = *fMwpcHits;
     Int_t size = clref.GetEntriesFast();
     return new (clref[size]) R3BSofMwpcHitData(x, y);
+}
+
+// -----   Private method AddR3BHitData  -------------------------------------------
+R3BHit* R3BSofMwpcDigitizer::AddR3BHitData(Int_t detId, Double_t x, Double_t y, Double_t eloss, Double_t time)
+{
+    // It fills the R3BHit
+    TClonesArray& clref = *fMwpcHits;
+    Int_t size = clref.GetEntriesFast();
+    return new (clref[size]) R3BHit(detId, x, y, eloss, time);
 }
 
 // -----   Public method Finish  ------------------------------------------------

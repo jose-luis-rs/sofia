@@ -8,6 +8,7 @@
 
 #include "FairTask.h"
 #include "R3BSofMwpcHitData.h"
+#include "R3BHit.h"
 #include <map>
 #include <string>
 
@@ -49,6 +50,7 @@ class R3BSofMwpcDigitizer : public FairTask
     TClonesArray* fMCTrack;
     TClonesArray* fMwpcPoints;
     TClonesArray* fMwpcHits;
+    Int_t fDetId;
     Float_t fsigma_x;
     Float_t fsigma_y;
     Float_t fangle;
@@ -58,6 +60,11 @@ class R3BSofMwpcDigitizer : public FairTask
     /** Private method AddHitData **/
     // Adds a R3BSofMwpcHitData to the MwpcHitCollection
     R3BSofMwpcHitData* AddHitData(Double_t x, Double_t y);
+
+    /** Private method AddR3BHitData **/
+    // Adds a R3BHit to the HitCollection
+    R3BHit* AddR3BHitData(Int_t detId, Double_t x, Double_t y, Double_t eloss, Double_t time);
+
 
   public:
     // Class definition

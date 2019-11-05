@@ -8,6 +8,7 @@
 
 #include "FairTask.h"
 #include "R3BSofTofWHitData.h"
+#include "R3BHit.h"
 #include <map>
 #include <string>
 
@@ -59,6 +60,10 @@ class R3BSofTofWDigitizer : public FairTask
     /** Private method AddHitData **/
     // Adds a R3BSofTofWHitData to the TofWHitCollection
     R3BSofTofWHitData* AddHitData(UChar_t paddle, Double_t x, Double_t y, Double_t time);
+
+    /** Private method AddR3BHitData **/
+    // Adds a R3BHit to the HitCollection
+    R3BHit* AddR3BHitData(Int_t detId, Double_t x, Double_t y, Double_t eloss, Double_t time);
 
   public:
     // Class definition

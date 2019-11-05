@@ -79,7 +79,9 @@ InitStatus R3BSofTofWDigitizer::Init()
     fTofPoints = (TClonesArray*)ioman->GetObject("SofTofWallPoint");
 
     // Register output array fTofHits
-    fTofHits = new TClonesArray("R3BSofTofWHitData", 10);
+    //fTofHits = new TClonesArray("R3BSofTofWHitData", 10);
+    //ioman->Register("TofWHit", "Digital response in TofW", fTofHits, kTRUE);
+    fTofHits = new TClonesArray("R3BHit", 10);
     ioman->Register("TofWHit", "Digital response in TofW", fTofHits, kTRUE);
 
     return kSUCCESS;
@@ -125,7 +127,8 @@ void R3BSofTofWDigitizer::Exec(Option_t* opt)
             x = (((x - fPosX) * cos(fangle * TMath::DegToRad())) - ((z - fPosZ) * sin(fangle * TMath::DegToRad())));
 
             time = pointData[i]->GetTime() + gRandom->Gaus(0., fsigma_t);
-            AddHitData(paddle, x, y, time);
+            //AddHitData(paddle, x, y, time);
+            AddR3BHitData(7, x, y, 0., time);
         }
     }
     if (pointData)
@@ -151,6 +154,15 @@ R3BSofTofWHitData* R3BSofTofWDigitizer::AddHitData(UChar_t paddle, Double_t x, D
     TClonesArray& clref = *fTofHits;
     Int_t size = clref.GetEntriesFast();
     return new (clref[size]) R3BSofTofWHitData(paddle, x, y, time);
+}
+
+// -----   Private method AddR3BHitData  -------------------------------------------
+R3BHit* R3BSofTofWDigitizer::AddR3BHitData(Int_t detId, Double_t x, Double_t y, Double_t eloss, Double_t time)
+{
+    // It fills the R3BHit
+    TClonesArray& clref = *fTofHits;
+    Int_t size = clref.GetEntriesFast();
+    return new (clref[size]) R3BHit(detId, x, y, eloss, time);
 }
 
 // -----   Public method Finish  ------------------------------------------------
