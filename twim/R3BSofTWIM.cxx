@@ -175,7 +175,7 @@ void R3BSofTWIM::EndOfEvent()
 // -----   Public method Register   -------------------------------------------
 void R3BSofTWIM::Register()
 {
-    FairRootManager::Instance()->Register("SofTWIMPoint", GetName(), fSofTWIMCollection, kTRUE);
+    FairRootManager::Instance()->Register("SofTwimPoint", GetName(), fSofTWIMCollection, kTRUE);
 }
 
 // -----   Public method GetCollection   --------------------------------------
