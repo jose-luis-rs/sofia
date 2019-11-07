@@ -49,6 +49,7 @@ class R3BSofFragmentTracker : public FairTask
     TClonesArray* fArrayMCTracks; // simulation output??? To compare?
     TClonesArray* fhitmwp3;
     TClonesArray* fhittof;
+    TClonesArray* fhittwim;
     R3BTrackingSetup* fDetectors; // array of R3BTrackingDetector
     std::vector<R3BTrackingParticle*> fFragments;
     TClonesArray* fArrayFragments;

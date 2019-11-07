@@ -38,6 +38,11 @@ void rundigi()
     mw1_digitizer->SetPosZ(16.);
     run->AddTask(mw1_digitizer);
 
+    // TWIM
+    R3BSofTwimDigitizer* twim_digitizer = new R3BSofTwimDigitizer("Twim",1);
+    //twim_digitizer->SetPosZ(16.);
+    run->AddTask(twim_digitizer);
+
     // MWPC2
     R3BSofMwpcDigitizer* mw2_digitizer = new R3BSofMwpcDigitizer("Mwpc2",1);
     mw2_digitizer->SetPosZ(95.);

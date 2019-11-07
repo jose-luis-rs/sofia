@@ -64,6 +64,7 @@ R3BSofFragmentTracker::R3BSofFragmentTracker(const char* name, Bool_t vis, Int_t
     , fArrayMCTracks(NULL)
     , fhitmwp3(NULL)
     , fhittof(NULL)
+    , fhittwim(NULL)
     , fDetectors(new R3BTrackingSetup())
     , fArrayFragments(new TClonesArray("R3BTrackingParticle"))
     , fNEvents(0)
@@ -94,6 +95,7 @@ InitStatus R3BSofFragmentTracker::Init()
 
     fhitmwp3 = (TClonesArray*)man->GetObject("Mwpc3Hit");
     fhittof = (TClonesArray*)man->GetObject("TofWHit");
+    fhittwim = (TClonesArray*)man->GetObject("TwimHit");
 
    // man->Register("TrackingParticle", "Tracking", fArrayFragments, kTRUE);
 
@@ -105,7 +107,7 @@ InitStatus R3BSofFragmentTracker::Init()
     fDetectors->Init();
 
 
-    fh_A_reco2 = new TH1F("h_A_reco", "Reconstructed mass", 200., 30., 50.);
+    fh_A_reco2 = new TH1F("h_A_reco", "Reconstructed mass", 400., 30., 150.);
 
  
     return kSUCCESS;
@@ -174,9 +176,19 @@ void R3BSofFragmentTracker::Exec(const Option_t*)
     Int_t nHits = fhitmwp3->GetEntries();
     Int_t nHitstof = fhittof->GetEntries();
 
+    float zf=0.;
+    Int_t nHitstwim = fhittwim->GetEntries();
+    for(int i=0;i<nHitstwim;i++){
+    R3BHit* twim = (R3BHit*)fhittwim->At(i);
+    if(twim->GetTime()>10.)zf=twim->GetTime();
+    }
+
+
     for(int i=0;i<nHits;i++){
     R3BHit* mw3 = (R3BHit*)fhitmwp3->At(i);
     R3BHit* tof = (R3BHit*)fhittof->At(i);
+
+    
 
     if(mw3&&tof&&(nHits==nHitstof)){
     
@@ -191,7 +203,7 @@ void R3BSofFragmentTracker::Exec(const Option_t*)
     double vel=len/tof->GetTime();
     double beta=vel/c;
     double gamma=1./sqrt(1.-beta*beta);
-    double aa=brho*18./(3.10716*beta*gamma);
+    double aa=brho*zf/(3.10716*beta*gamma);
 
     fh_A_reco2->Fill(aa+0.4);
 
