@@ -27,7 +27,7 @@ void runsim(Int_t nEvents = 0)
     TString generator1 = "box";
     TString generator2 = "ascii";
     TString generator3 = "r3b";
-    TString fGenerator = generator2; // Event generator type: box, gammas, r3b, ion, ascii
+    TString fGenerator = generator1; // Event generator type: box, gammas, r3b, ion, ascii
 
     TString fEventFile = "p2p_U238_500.txt"; // Input event file in the case of ascii generator
 
@@ -122,7 +122,7 @@ void runsim(Int_t nEvents = 0)
 
     // Cave definition
     FairModule* cave = new R3BCave("CAVE");
-    cave->SetGeometryFileName("r3b_cave_vacuum.geo");
+    cave->SetGeometryFileName("r3b_cave.geo");
     run->AddModule(cave);
 
     // R3B-Music definition
@@ -150,7 +150,6 @@ void runsim(Int_t nEvents = 0)
     {
         R3BCalifa* califa = new R3BCalifa(fCalifaGeo, { 0., 0., -66.5 });
         califa->SelectGeometryVersion(fCalifaGeoVer);
-        califa->SetNonUniformity(fCalifaNonU);
         run->AddModule(califa);
     }
 
@@ -163,7 +162,7 @@ void runsim(Int_t nEvents = 0)
     // Twim definition
     if (fTwim)
     {
-        run->AddModule(new R3BSofTWIM(fTwimGeo, { 0., 0., 50. }));
+        run->AddModule(new R3BSofTWIM(fTwimGeo, { 2., 0., 50. }));
     }
 
     // MWPC2 definition
@@ -191,7 +190,7 @@ void runsim(Int_t nEvents = 0)
     {
         TGeoRotation* rmw3 = new TGeoRotation("Mwpc3rot");
         rmw3->RotateY(-29.0);
-        run->AddModule(new R3BSofMwpc3(fMwpc3Geo, { -243., 0., 689., rmw3 }));
+        run->AddModule(new R3BSofMwpc3(fMwpc3Geo, { -180., 0., 689., rmw3 }));
     }
 
     // Sofia ToF-Wall definition
@@ -199,7 +198,7 @@ void runsim(Int_t nEvents = 0)
     {
         TGeoRotation* rtof = new TGeoRotation("Tofrot");
         rtof->RotateY(-29.0);
-        run->AddModule(new R3BSofTofWall(fSofTofWallGeo, { -257., 0., 710., rtof }));
+        run->AddModule(new R3BSofTofWall(fSofTofWallGeo, { -187., 0., 710., rtof }));
     }
 
     // NeuLand Scintillator Detector
@@ -268,7 +267,7 @@ void runsim(Int_t nEvents = 0)
         // primGen->AddGenerator(boxGen);
 
         // 128-Sn fragment
-        R3BIonGenerator* ionGen = new R3BIonGenerator(18, 40, 18, 1, 0., 0., 0.951);
+        R3BIonGenerator* ionGen = new R3BIonGenerator(92, 238, 92, 1, 0., 0., 1.845);
         ionGen->SetSpotRadius(0.0, -300., 0.);
         primGen->AddGenerator(ionGen);
 
