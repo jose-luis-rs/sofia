@@ -1,11 +1,11 @@
 // ------------------------------------------------------------
-// -----                R3BSofTwimOnlineSpectra           -----
+// -----                R3BMusOnlineSpectra               -----
 // -----    Created 06/10/19  by J.L. Rodriguez-Sanchez   -----
 // -----           Fill SOFIA online histograms           -----
 // ------------------------------------------------------------
 
-#ifndef R3BSofTwimOnlineSpectra_H
-#define R3BSofTwimOnlineSpectra_H
+#ifndef R3BMusOnlineSpectra_H
+#define R3BMusOnlineSpectra_H
 
 #include "FairTask.h"
 #include <sstream>
@@ -18,23 +18,23 @@
 #include "TH2F.h"
 #include "TCanvas.h"
 
-#define NbSections 1
-#define NbAnodes 16
+#define NbSectionsMus 1
+#define NbAnodesMus 8
 
 class TClonesArray;
 class R3BEventHeader;
 
 /**
- * This taks reads TWIM data and plots online histograms 
+ * This taks reads MUSIC data and plots online histograms 
  */
-class R3BSofTwimOnlineSpectra : public FairTask {
+class R3BMusOnlineSpectra : public FairTask {
 
  public:
   /**
    * Default constructor.
    * Creates an instance of the task with default parameters.
    */
-  R3BSofTwimOnlineSpectra();
+  R3BMusOnlineSpectra();
 
   /**
    * Standard constructor.
@@ -42,13 +42,13 @@ class R3BSofTwimOnlineSpectra : public FairTask {
    * @param name a name of the task.
    * @param iVerbose a verbosity level.
    */
-  R3BSofTwimOnlineSpectra(const char* name, Int_t iVerbose = 1);
+  R3BMusOnlineSpectra(const char* name, Int_t iVerbose = 1);
 
   /**
    * Destructor.
    * Frees the memory used by the object.
    */
-  virtual ~R3BSofTwimOnlineSpectra();
+  virtual ~R3BMusOnlineSpectra();
 
   /**
    * Method for task initialization.
@@ -85,30 +85,30 @@ class R3BSofTwimOnlineSpectra : public FairTask {
 
   private:
 
-  TClonesArray* fMappedItemsTwim;         /**< Array with mapped items. */
+  TClonesArray* fMappedItemsMus;         /**< Array with mapped items. */
 
   // check for trigger should be done globablly (somewhere else)
   R3BEventHeader* header;               /**< Event header.      */
   Int_t fNEvents;        	   	/**< Event counter.     */
 
   //Canvas
-  TCanvas* cTwimMap_E[NbSections];
-  TCanvas* cTwimMap_EvsDT[NbSections];
-  TCanvas* cTwimMap_DT[NbSections];
+  TCanvas* cTwimMap_E[NbSectionsMus];
+  TCanvas* cTwimMap_EvsDT[NbSectionsMus];
+  TCanvas* cTwimMap_DT[NbSectionsMus];
   TCanvas* cTwimMap_ESum, * cTwimMap_ESum1, *cTwimMap_ESum2;
 
   //Histograms for Mapped data
-  TH1F* fh1_twimmap_E[NbSections][NbAnodes];
-  TH1F* fh1_twimmap_DT[NbSections][NbAnodes];
+  TH1F* fh1_twimmap_E[NbSectionsMus][NbAnodesMus];
+  TH1F* fh1_twimmap_DT[NbSectionsMus][NbAnodesMus];
   TH1F* fh1_twim_ESum[3];
   TH2F* fh2_twim_ESum;
-  TH2F* fh2_twim_EneRawVsDriftTime[NbSections][NbAnodes];
+  TH2F* fh2_twim_EneRawVsDriftTime[NbSectionsMus][NbAnodesMus];
 
   //Histograms for Cal data
 
 
   public:
-  ClassDef(R3BSofTwimOnlineSpectra, 1)
+  ClassDef(R3BMusOnlineSpectra, 1)
 };
 
 #endif
