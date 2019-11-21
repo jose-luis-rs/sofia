@@ -7,11 +7,11 @@
 typedef struct EXT_STR_h101_t {
   EXT_STR_h101_unpack_t unpack;
   //EXT_STR_h101_MUSIC_onion_t music;
-  //EXT_STR_h101_SOFTWIM_onion_t twim;
+  EXT_STR_h101_SOFTWIM_onion_t twim;
   //EXT_STR_h101_SOFMWPC_onion_t mwpc;
 } EXT_STR_h101;
 
-void at_online() {
+void eng_online() {
   TStopwatch timer;
   timer.Start();
   
@@ -20,7 +20,8 @@ void at_online() {
 
   // Create source using ucesb for input ------------------
   
-  TString filename = "--stream=lxg0898:6002";
+  //TString filename = "--stream=lxg0898:6002";
+  TString filename = "~/lmd/ams_r4l-44_2019-09-12.lmd";
 
   TString outputFileName = "data_at_online.root";
   
