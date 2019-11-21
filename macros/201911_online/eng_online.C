@@ -6,9 +6,9 @@
 
 typedef struct EXT_STR_h101_t {
   EXT_STR_h101_unpack_t unpack;
-  //EXT_STR_h101_MUSIC_onion_t music;
+  EXT_STR_h101_MUSIC_onion_t music;
   EXT_STR_h101_SOFTWIM_onion_t twim;
-  //EXT_STR_h101_SOFMWPC_onion_t mwpc;
+  EXT_STR_h101_SOFMWPC_onion_t mwpc;
 } EXT_STR_h101;
 
 void eng_online() {
@@ -20,8 +20,8 @@ void eng_online() {
 
   // Create source using ucesb for input ------------------
   
-  //TString filename = "--stream=lxg0898:6002";
-  TString filename = "~/lmd/ams_r4l-44_2019-09-12.lmd";
+  TString filename = "--stream=lxg0898:6002";
+  //TString filename = "~/lmd/ams_r4l-44_2019-09-12.lmd";
 
   TString outputFileName = "data_at_online.root";
   
@@ -31,7 +31,7 @@ void eng_online() {
   ucesb_path.ReplaceAll("//","/");
   
   EXT_STR_h101 ucesb_struct;
-/*
+
   R3BUcesbSource* source = new R3BUcesbSource(filename, ntuple_options,
 					      ucesb_path, &ucesb_struct, sizeof(ucesb_struct));
   source->SetMaxEvents(nev);
@@ -56,6 +56,49 @@ void eng_online() {
   // Runtime data base ------------------------------------ 
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
 
+  /* Add analysis task ------------------------------------ */  
+  R3BSofMwpc0Mapped2Cal* aMap2Cal = new R3BSofMwpc0Mapped2Cal();
+  //Map2Cal->SetOnline(true);
+  run->AddTask(aMap2Cal);
+
+  R3BSofMwpc0Cal2Hit* Calh = new R3BSofMwpc0Cal2Hit();
+  //Map2Cal->SetOnline(true);
+  run->AddTask(Calh);
+
+
+  R3BSofMwpc2Mapped2Cal* Map2Cal = new R3BSofMwpc2Mapped2Cal();
+  //Map2Cal->SetOnline(true);
+  run->AddTask(Map2Cal);
+
+
+  R3BSofMwpc2Cal2Hit* Calh2 = new R3BSofMwpc2Cal2Hit();
+  //Map2Cal->SetOnline(true);
+  run->AddTask(Calh2);
+
+  R3BSofMwpc3Mapped2Cal* cMap2Cal = new R3BSofMwpc3Mapped2Cal();
+  //Map2Cal->SetOnline(true);
+  run->AddTask(cMap2Cal);
+
+  FairParAsciiFileIo* parIo1 = new FairParAsciiFileIo();//Ascii
+  parIo1->open("Mwpc_dummy_CalibParam.par","in");
+  rtdb->setFirstInput(parIo1);
+  rtdb->print();
+
+
+  /* Add online task ------------------------------------ */
+  R3BSofAtOnlineSpectra* atonline= new R3BSofAtOnlineSpectra();
+  run->AddTask(atonline);
+  R3BSofTwimOnlineSpectra* twonline= new R3BSofTwimOnlineSpectra();
+  run->AddTask(twonline);
+  R3BSofMwpcOnlineSpectra* mw0online= new R3BSofMwpcOnlineSpectra("SofMwpc0OnlineSpectra",1,"Mwpc0");
+  run->AddTask(mw0online);
+  R3BSofMwpcOnlineSpectra* mw2online= new R3BSofMwpcOnlineSpectra("SofMwpc2OnlineSpectra",1,"Mwpc2");
+  run->AddTask(mw2online);
+  R3BSofMwpcOnlineSpectra* mw3online= new R3BSofMwpcOnlineSpectra("SofMwpc3OnlineSpectra",1,"Mwpc3");
+  run->AddTask(mw3online);
+
+  R3BSofOnlineSpectra* sofonline= new R3BSofOnlineSpectra();
+  run->AddTask(sofonline);
 
   // Initialize ------------------------------------------- 
   run->Init();
@@ -66,7 +109,7 @@ void eng_online() {
   run->Run((nev < 0) ? nev : 0, (nev < 0) ? 0 : nev);
 
 
-*/
+
 
   // Finish ----------------------------------------------- 
   timer.Stop();

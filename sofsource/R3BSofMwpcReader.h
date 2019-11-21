@@ -6,6 +6,7 @@
 
 struct EXT_STR_h101_SOFMWPC_t;
 typedef struct EXT_STR_h101_SOFMWPC_t EXT_STR_h101_SOFMWPC;
+typedef struct EXT_STR_h101_SOFMWPC_onion_t EXT_STR_h101_SOFMWPC_onion;
 class FairLogger;
 
 class R3BSofMwpcReader : public R3BReader
