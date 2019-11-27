@@ -8,6 +8,10 @@
 
 #pragma link C++ class R3BSofSciMapped2TcalPar+;
 #pragma link C++ class R3BSofSciMapped2Tcal+;
+
+#pragma link C++ class R3BSofSciContFact+;
+#pragma link C++ class R3BSofSciSingleTcalPar+;
+
 #pragma link C++ class R3BSofSciTcal2SingleTcalPar+;
 
 

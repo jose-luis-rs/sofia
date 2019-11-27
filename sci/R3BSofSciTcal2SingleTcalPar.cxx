@@ -23,10 +23,6 @@
 #include <iostream>
 #include <stdlib.h>
 
-// for the engineering run (fNumDetectors(1) instead of fNumDetectors(2)
-#define NUMBER_OF_DETECTORS 1 
-#define NUMBER_OF_CHANNELS 3 // 2PMT + Tref
-
 
 // *** ******************************************* *** //
 // *** SofSci at S2, Pmt Right (Tcal Data)         *** //
@@ -132,6 +128,10 @@ InitStatus R3BSofSciTcal2SingleTcalPar::Init() {
     fh_RawPosMult1[det] = new TH1F(name,name,100000,-5000,5000);
   }
   
+#if NUMBER_OF_DETECTORS==2
+  sprintf(name,"RawTof_FromS2_to_CaveC");
+  fh_RawTofMult1 = new TH1D(name,name,100000,-1000,1000);
+#endif
   return kSUCCESS;
 }
 
@@ -144,6 +144,39 @@ InitStatus R3BSofSciTcal2SingleTcalPar::ReInit() {
 
 // -----   Public method Exec   --------------------------------------------
 void R3BSofSciTcal2SingleTcalPar::Exec(Option_t* opt) {
+  ExecRawPos();
+  // TO DO AND SHOULD BE IN #define #else #endif  ON NUMBER_OF_DETECTORS CASE : ExecRawPos();
+}
+
+
+// ---- Public method Reset   --------------------------------------------------
+void R3BSofSciTcal2SingleTcalPar::Reset() 
+{
+}
+
+void R3BSofSciTcal2SingleTcalPar::FinishEvent() 
+{
+}
+
+// ---- Public method Finish   --------------------------------------------------
+void R3BSofSciTcal2SingleTcalPar::FinishTask() 
+{  
+  CalculateRawPosSingleTcalParams();
+  // TO DO AND SHOULD BE IN #define #else #endif  ON NUMBER_OF_DETECTORS CASE : CalculateRawTofSingleTcalParams();
+  fSingleTcalPar->printParams();
+}
+
+
+
+
+
+
+// --- -------------------------- --- //
+// --- WHEN NO SCINTILLATOR AT S2 --- //
+// --- -------------------------- --- //
+
+// ----------------------------------------------------------
+void R3BSofSciTcal2SingleTcalPar::ExecRawPos() {
 
   // --- ------------------------------ --- //
   // --- LOOP OVER TCAL HITS FOR SofSci --- //
@@ -186,24 +219,7 @@ void R3BSofSciTcal2SingleTcalPar::Exec(Option_t* opt) {
   }
 }
 
-// ---- Public method Reset   --------------------------------------------------
-void R3BSofSciTcal2SingleTcalPar::Reset() 
-{
-}
-
-void R3BSofSciTcal2SingleTcalPar::FinishEvent() 
-{
-}
-
-// ---- Public method Finish   --------------------------------------------------
-void R3BSofSciTcal2SingleTcalPar::FinishTask() 
-{  
-  CalculateRawPosSingleTcalParams();
-  fSingleTcalPar->printParams();
-}
-
-
-//------------------
+// ------------------------------
 void R3BSofSciTcal2SingleTcalPar::CalculateRawPosSingleTcalParams()
 {
   LOG(INFO) << "R3BSofSciTcal2SingleTcalPar: CalculateVftxSingleTcalParams()";
@@ -260,6 +276,22 @@ void R3BSofSciTcal2SingleTcalPar::CalculateRawPosSingleTcalParams()
   fSingleTcalPar->setChanged();
   return;
   
+}
+
+
+// --- ----------------------- --- //
+// --- WHEN SCINTILLATOR AT S2 --- //
+// --- ----------------------- --- //
+
+// ----------------------------------------------------------
+void R3BSofSciTcal2SingleTcalPar::ExecRawTof() 
+{
+  // TO DO 
+}
+// ------------------------------
+void R3BSofSciTcal2SingleTcalPar::CalculateRawTofSingleTcalParams()
+{
+  // TO DO 
 }
 
 ClassImp(R3BSofSciTcal2SingleTcalPar)
