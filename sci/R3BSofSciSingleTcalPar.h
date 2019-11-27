@@ -37,14 +37,14 @@ class R3BSofSciSingleTcalPar : public FairParGenericSet
   /** Accessor functions **/
   const Double_t GetNumDetectors() { return fNumDetectors; }
   const Double_t GetNumSignals() { return fNumSignals; }
-  const Double_t GetNumTcalParsPerSignal() { return fNumSingleTcalParsPerSignal; }
+  const Double_t GetNumParsPerSignal() { return fNumParsPerSignal; }
   TArrayF* GetAllSignalsTcalParams() { return fAllSignalsSingleTcalParams; }
   Double_t GetSignalTcalParams(UInt_t rank) { return (Double_t)fAllSignalsSingleTcalParams->GetAt(rank); }
   
   void SetNumDetectors(Int_t NumberOfDetectors) { fNumDetectors = NumberOfDetectors; }
   void SetNumSignals(Int_t NumberOfSignals)     { fNumSignals = NumberOfSignals ;  }
-  void SetNumTcalParsPerSignal(Int_t NumberOfParsPerSignal) { fNumSingleTcalParsPerSignal = NumberOfParsPerSignal; }
-  void SetSignalTcalParams(Double_t ft_ns, UInt_t rank) { fAllSignalsSingleTcalParams->AddAt(ft_ns, rank); }
+  void SetNumParsPerSignal(Int_t NumberOfParsPerSignal) { fNumParsPerSignal = NumberOfParsPerSignal; }
+  void SetSignalParams(Double_t limit, UInt_t rank) { fAllSignalsSingleTcalParams->AddAt(limit, rank); }
   
   /** Create more Methods if you need them! **/
   
@@ -52,7 +52,7 @@ class R3BSofSciSingleTcalPar : public FairParGenericSet
   TArrayF* fAllSignalsSingleTcalParams; // Calibration Parameters for all signals of one detector
   Int_t fNumDetectors;            // number of detectors 
   Int_t fNumSignals;              // =fNumDetectors if RawPos , but =1 if RawTof
-  Int_t fNumSingleTcalParsPerSignal;
+  Int_t fNumParsPerSignal;
   const R3BSofSciSingleTcalPar& operator=(const R3BSofSciSingleTcalPar&); /*< an assignment operator>*/
   
   R3BSofSciSingleTcalPar(const R3BSofSciSingleTcalPar&); // a copy constructor

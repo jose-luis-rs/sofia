@@ -19,7 +19,7 @@ R3BSofSciSingleTcalPar::R3BSofSciSingleTcalPar(const char* name, const char* tit
   : FairParGenericSet(name, title, context)
   , fNumDetectors(0)
   , fNumSignals(0)
-  , fNumTcalParsPerSignal(0)
+  , fNumParsPerSignal(0)
 {
   fAllSignalsSingleTcalParams = new TArrayF(MAX_SINGLETCALPAR);
 }
@@ -51,7 +51,7 @@ void R3BSofSciSingleTcalPar::putParams(FairParamList* list)
         return;
     }
 
-    Int_t array_size = fNumSignals * fNumTcalParsPerSignal;
+    Int_t array_size = fNumSignals * fNumParsPerSignal;
     LOG(INFO) << "Array Size: " << array_size;
 
     fAllSignalsSingleTcalParams->Set(array_size);
@@ -59,7 +59,7 @@ void R3BSofSciSingleTcalPar::putParams(FairParamList* list)
     list->add("SingleTcalPar", *fAllSignalsSingleTcalParams);
     list->add("nDetectorsSingleTcalPar", fNumDetectors);
     list->add("nSignalsSingleTcalPar", fNumSignals);
-    list->add("nSingleTcalParsPerSignal", fNumSingleTcalParsPerSignal);
+    list->add("nSingleTcalParsPerSignal", fNumParsPerSignal);
 }
 
 // ----  Method getParams ------------------------------------------------------
@@ -78,12 +78,12 @@ Bool_t R3BSofSciSingleTcalPar::getParams(FairParamList* list)
     {
         return kFALSE;
     }
-    if (!list->fill("nSingleTcalParsPerSignal", &fNumSingleTcalParsPerSignal))
+    if (!list->fill("nSingleTcalParsPerSignal", &fNumParsPerSignal))
     {
         return kFALSE;
     }
 
-    Int_t array_size = fNumSignals * fNumTcalParsPerSignal;
+    Int_t array_size = fNumSignals * fNumParsPerSignal;
     LOG(INFO) << "Array Size: " << array_size;
     fAllSignalsSingleTcalParams->Set(array_size);
 
@@ -100,13 +100,13 @@ Bool_t R3BSofSciSingleTcalPar::getParams(FairParamList* list)
 void R3BSofSciSingleTcalPar::printParams()
 {
     LOG(INFO) << "R3BSofSciSingleTcalPar: SofSciSingleTcal Parameters: ";
-    Int_t array_size = fNumSignals * fNumTcalParsPerSignal;
+    Int_t array_size = fNumSignals * fNumParsPerSignal;
 
     cout << "--- --------------------------------------------" << endl;
     cout << "--- Single Tcal Parameters :  " << endl;
     cout << "--- --------------------------------------------" << endl;
-    for (Int_t param=0; param < array_size; sig++)
+    for (Int_t param=0; param < array_size; param++)
       {
-	cout << "LIMIT " << bin << " = " << fAllSignalsSingleTcalParams->GetAt(param) << endl;
+	cout << "LIMIT " << param << " = " << fAllSignalsSingleTcalParams->GetAt(param) << endl;
       }
 }

@@ -3,15 +3,17 @@
 
 #include "FairTask.h"
 #include "TH1F.h"
+#include "TH1D.h"
 
 class TClonesArray;
-class R3BSofSingleTcalPar;
+class R3BSofSciSingleTcalPar;
 class R3BEventHeader;
 
 
 // for the engineering run (fNumDetectors(1) instead of fNumDetectors(2)
 #define NUMBER_OF_DETECTORS 1 
 #define NUMBER_OF_CHANNELS 3 // 2PMT + Tref
+#define NUMBER_OF_SIGNALS 1 // 1 if RawTof used or  NUMBER_OF_DETECTORS of RawPos used
 
 
 class R3BSofSciTcal2SingleTcalPar : public FairTask {
@@ -76,8 +78,8 @@ class R3BSofSciTcal2SingleTcalPar : public FairTask {
     // if RawTof : fNumSignals = 1 
     fNumSignals=NumberOfSignals;  
   }
-  void SetNumSingleTcalParsPerSignal(Int_t NumberOfSingleTcalParsPerSignal) {
-    fNumSingleTcalParsPerSignal=NumberOfSingleTcalParsPerSignal;
+  void SetNumParsPerSignal(Int_t NumberOfParsPerSignal) {
+    fNumParsPerSignal=NumberOfParsPerSignal;
   }
   void SetMinStatistics(Int_t minstat){
     fMinStatistics=minstat;
@@ -88,11 +90,11 @@ class R3BSofSciTcal2SingleTcalPar : public FairTask {
  protected:
   Int_t fNumDetectors;  // number of detectors 2 if FRS, 1 if Cave C only
   Int_t fNumSignals;    // number of signal    1 if RawTof used, fNumDetectors if RawPos used
-  Int_t fNumSingleTcalParsPerSignal; // =2 for each signal
+  Int_t fNumParsPerSignal; // =2 for each signal
   Int_t fMinStatistics; // minimum statistics to proceed to the calibration
 
   // calibration parameters
-  R3BSofSingleTcalPar* fSingleTcalPar;  
+  R3BSofSciSingleTcalPar* fSingleTcalPar;  
 
   // input data
   TClonesArray* fTcal;         

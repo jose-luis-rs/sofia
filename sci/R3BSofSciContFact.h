@@ -19,7 +19,7 @@ class R3BSofSciContFact : public FairContFact
     ~R3BSofSciContFact() {}
     FairParSet* createContainer(FairContainer*);
     void activateParIo(FairParIo* io);
-    ClassDef(R3BSofScoContFact, 1)
+    ClassDef(R3BSofSciContFact, 1)
 };
 
 #endif // R3BSCICONTFACT_H

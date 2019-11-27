@@ -1,7 +1,7 @@
 #include "R3BSofSciTcal2SingleTcalPar.h"
 
 #include "R3BSofSciTcalData.h"
-#include "R3BSofSingleTcalPar.h"
+#include "R3BSofSciSingleTcalPar.h"
 
 #include "R3BEventHeader.h"
 
@@ -13,8 +13,6 @@
 
 #include "TClonesArray.h"
 #include "TGeoMatrix.h"
-#include "TH1F.h"
-#include "TF1.h"
 #include "TMath.h"
 #include "TObjArray.h"
 #include "TRandom.h"
@@ -55,27 +53,27 @@
 R3BSofSciTcal2SingleTcalPar::R3BSofSciTcal2SingleTcalPar() 
   : FairTask("R3BSofSciTcal2SingleTcalPar",1)
   , fNumDetectors(NUMBER_OF_DETECTORS)
-  , fNumSingleTcalParsPerSignal(2)
+  , fNumSignals(NUMBER_OF_SIGNALS)
+  , fNumParsPerSignal(2)
   , fMinStatistics(0)
   , fTcal(NULL)
   , fSingleTcalPar(NULL)
   , fOutputFile(NULL) 
 {
-  fNumSignals = fNumDetectors ;
 }
 
 //R3BSofSciTcal2SingleTcalPar: Standard Constructor --------------------------
 R3BSofSciTcal2SingleTcalPar::R3BSofSciTcal2SingleTcalPar(const char* name, Int_t iVerbose) 
   : FairTask(name, iVerbose)
   , fNumDetectors(NUMBER_OF_DETECTORS)
-  , fNumSingleTcalParsPerSignal(2)
+  , fNumSignals(NUMBER_OF_SIGNALS)
+  , fNumParsPerSignal(2)
   , fMinStatistics(0)
   , fTcal(NULL)
   , fSingleTcalPar(NULL)
   , fOutputFile(NULL) 
 
 {
-  fNumSignals = fNumDetectors ;
 }
 
 //R3BSofSciTcal2SingleTcalPar: Destructor ----------------------------------------
@@ -111,7 +109,7 @@ InitStatus R3BSofSciTcal2SingleTcalPar::Init() {
   FairRuntimeDb* rtdb = FairRuntimeDb::instance();
   if (!rtdb) { return kFATAL;}  
 
-  fSingleTcalPar=(R3BSofSingleTcalPar*)rtdb->getContainer("SofSciSingleTcalPar");
+  fSingleTcalPar=(R3BSofSciSingleTcalPar*)rtdb->getContainer("SofSciSingleTcalPar");
   if (!fSingleTcalPar) {
     LOG(ERROR)<<"R3BSofSciTcal2SingleTcalPar::Init() Couldn't get handle on SofSciSingleTcalPar container";
     return kFATAL;
@@ -125,7 +123,7 @@ InitStatus R3BSofSciTcal2SingleTcalPar::Init() {
   fh_RawPosMult1 = new TH1D*[fNumSignals];
   for(Int_t det=0; det<fNumDetectors; det++){
     sprintf(name,"PosRaw_Sci%i",det+1);
-    fh_RawPosMult1[det] = new TH1F(name,name,100000,-5000,5000);
+    fh_RawPosMult1[det] = new TH1D(name,name,100000,-5000,5000);
   }
   
 #if NUMBER_OF_DETECTORS==2
@@ -190,10 +188,9 @@ void R3BSofSciTcal2SingleTcalPar::ExecRawPos() {
   UShort_t iPmt; // 0 based Pmt number
 
   for(UShort_t d=0; d<NUMBER_OF_DETECTORS; d++){
-    iLeftRawTimeNs[d] = 0;
-    iRightRawTimeNs[d] = 0;
     for(UShort_t ch=0; ch<NUMBER_OF_CHANNELS; ch++){
       mult[d*NUMBER_OF_CHANNELS+ch] = 0;
+      iRawTimeNs[d*NUMBER_OF_CHANNELS+ch] = 0;
     }
   }
 
@@ -206,7 +203,7 @@ void R3BSofSciTcal2SingleTcalPar::ExecRawPos() {
     }           
     iDet = hitSci->GetDetector()-1; // get the 0 based Det number
     iPmt = hitSci->GetPmt()-1;      // get the 0 based Pmt number
-    iRawTimeNs[iDet*NUMBER_OF_CHANNELS+iPmt] = hitSci->GetTimeRawNs();
+    iRawTimeNs[iDet*NUMBER_OF_CHANNELS+iPmt] = hitSci->GetRawTimeNs();
     mult[iDet*NUMBER_OF_CHANNELS+iPmt]++;
   }// end of for(ihit) 
 
@@ -226,30 +223,10 @@ void R3BSofSciTcal2SingleTcalPar::CalculateRawPosSingleTcalParams()
   
   fSingleTcalPar->SetNumDetectors(fNumDetectors);
   fSingleTcalPar->SetNumSignals(fNumDetectors);
-  fSingleTcalPar->SetNumSingleTcalParsPerSignal(fNumSingleTcalParsPerSignal);
-
-  UInt_t IntegralTot;
-  UInt_t IntegralPartial;
-  Double_t Bin2Ns[fNumSingleTcalParsPerSignal];
-
-  for(Int_t sig=0; sig<fNumSignals; sig++){
-    if(fh_RawPosMult1[sig]->GetEntries()>fMinStatistics){
-      IntegralTot = fh_TimeFineBin[sig]->Integral();
-      IntegralPartial = 0;
-      for(Int_t bin=0; bin<fNumSingleTcalParsPerSignal; bin++){
-	IntegralPartial+=fh_TimeFineBin[sig]->GetBinContent(bin+1);
-	Bin2Ns[bin] = 5.*((Double_t)IntegralPartial) / (Double_t)IntegralTot;
-	fh_TimeFineNs[sig]->SetBinContent(bin+1,Bin2Ns[bin]);
-	fSingleTcalPar->SetSignalSingleTcalParams(Bin2Ns[bin],sig*fNumSingleTcalParsPerSignal+bin);
-      }
-    }
-    fh_TimeFineNs[sig]->Write(); // empty histo if stat <fMinStatistics
-    fh_TimeFineBin[sig]->Write();
-  }
+  fSingleTcalPar->SetNumParsPerSignal(fNumParsPerSignal);
 
   Double_t iMax;
   Int_t bin, binLimit; 
-  Double_t RawPosLimit[fNumSingleTcalParsPerSignal];
   for(Int_t sig=0; sig<fNumSignals; sig++){
     if(fh_RawPosMult1[sig]->GetEntries()>fMinStatistics){
       iMax = fh_RawPosMult1[sig]->GetMaximum();
@@ -260,7 +237,7 @@ void R3BSofSciTcal2SingleTcalPar::CalculateRawPosSingleTcalParams()
 	if(fh_RawPosMult1[sig]->GetBinContent(bin)>iMax/10000.) binLimit=bin;
 	bin++;
       }
-      fSingleTcalPar->SetSignalSingleTcalParams(fh_RawPosMult1[0]->GetBinLowEdge(binLimit));
+      fSingleTcalPar->SetSignalParams(fh_RawPosMult1[sig]->GetBinLowEdge(binLimit),sig*2);
       //HIGHER LIMIT
       bin=fh_RawPosMult1[sig]->GetNbinsX();
       binLimit=fh_RawPosMult1[sig]->GetNbinsX();
@@ -268,7 +245,7 @@ void R3BSofSciTcal2SingleTcalPar::CalculateRawPosSingleTcalParams()
 	if(fh_RawPosMult1[sig]->GetBinContent(bin)>iMax/10000.) binLimit=bin;
 	bin--;
       }
-      fSingleTcalPar->SetSignalSingleTcalParams(fh_RawPosMult1[1]->GetBinLowEdge(binLimit));
+      fSingleTcalPar->SetSignalParams(fh_RawPosMult1[sig]->GetBinLowEdge(binLimit),sig*2+1);
     }
     fh_RawPosMult1[sig]->Write();
   }

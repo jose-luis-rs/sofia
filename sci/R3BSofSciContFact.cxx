@@ -5,7 +5,7 @@
 #include "FairParRootFileIo.h"
 #include "FairRuntimeDb.h"
 
-#include "R3BSofSciPar.h"
+#include "R3BSofSciSingleTcalPar.h"
 
 #include "TClass.h"
 
@@ -50,7 +50,7 @@ FairParSet* R3BSofSciContFact::createContainer(FairContainer* c)
 
     if (strcmp(name, "SofSciSingleTcalPar") == 0)
     {
-        p = new R3BSofSciPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+        p = new R3BSofSciSingleTcalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
     return p;
 }
