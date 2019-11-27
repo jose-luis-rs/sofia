@@ -11,7 +11,7 @@ R3BSofSciSingleTcalData::R3BSofSciSingleTcalData()
 
 R3BSofSciSingleTcalData::R3BSofSciSingleTcalData(UShort_t detector, 
 						 Double_t tl, 
-						 Double_t tr
+						 Double_t tr,
 						 Double_t t,
 						 Double_t pos)
     : fDetector(detector)
