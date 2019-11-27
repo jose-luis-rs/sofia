@@ -31,6 +31,7 @@ set(SRCS
 #Put here your sourcefiles
 R3BSofSciMapped2TcalPar.cxx
 R3BSofSciMapped2Tcal.cxx
+R3BSofSciTcal2SingleTcalPar.cxx
 )
 
 # fill list of header files from list of source files
