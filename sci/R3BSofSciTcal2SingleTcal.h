@@ -1,5 +1,5 @@
 // *** *************************************************************** *** //
-// ***                  R3BSofSciTcal2SingleHit                        *** //
+// ***                  R3BSofSciTcal2SingleTcal                        *** //
 // *** ---> whatever multiplicity per PMT, select the propoer hit      *** //
 // *** *************************************************************** *** //
 
@@ -8,8 +8,8 @@
 
 #include "FairTask.h"
 
-#include "R3BSofTcalPar.h"
-#include "R3BSofSciTcalData.h"
+#include "R3BSofSingleTcalPar.h"
+#include "R3BSofSciSingleTcalData.h"
 
 #include "TClonesArray.h"
 #include "TMath.h"
@@ -35,11 +35,12 @@ class R3BSofSciTcal2SingleTcal : public FairTask
   virtual void Exec(Option_t* option);
   virtual void FinishEvent();
   virtual void FinishTask();
-  Double_t HitFinder(UShort_t det, UShort_t pmtl, UShort_t pmtr, UInt_t tlns, UInt_t trns);
+  Double_t CalculateRawPosNs(UInt_t tlns, UInt_t trns);
+  Double_t CalculateRawTimeNs(UInt_t tlns, UInt_t trns);
 
  private:
-  TClonesArray*  fTcalPmt;            
-  R3BSofTcalPar* fPosPar;          
+  TClonesArray*  fTcal;            
+  R3BSofTcalPar* fSingleTcalPar;          
   TClonesArray*  fSingleTcal;         
   
   UInt_t fNumTcalItems;               // number of Tcal items per event
