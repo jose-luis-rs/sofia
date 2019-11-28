@@ -98,17 +98,22 @@ InitStatus R3BSofSciTcal2SingleTcal::ReInit()
 void R3BSofSciTcal2SingleTcal::Exec(Option_t* option)
 {
   
-  UShort_t iDet;
-  UShort_t iCh;
+  UShort_t iDet; // 0-based
+  UShort_t iCh;  // 0-based
   Double_t iTraw;
+  UShort_t mult[fTcal->GetNumDetectors*2]; // 2 pmt per plastic
+  UShort_t mult_max;
 
   Int_t nHitsPerEvent_SofSci = fTcal->GetEntries();
   for(int ihit=0; ihit<nHitsPerEvent_SofSci; ihit++){
     R3BSofSciTcalData* hit = (R3BSofSciTcalData*)fTcal->At(ihit);
     if(!hit) continue;
-    iDet  = hit->GetDetector();
-    iCh   = hit->GetPmt();
+    if(hit->GetPmt()==2) contiue; // no interest for the Common reference
+
+    iDet  = hit->GetDetector()-1;
+    iCh   = hit->GetPmt()-1;
     iTraw = hit->GetTimeRawNs();
+    mult[iDet*2+iCh]++;
   }
     
   // TO DO : LOOP OVER THE ENTRIES TO GET ALL THE POSSIBLE COMBINATUION AND TO FIND THE GOOD ONE

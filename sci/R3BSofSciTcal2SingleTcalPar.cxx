@@ -123,7 +123,7 @@ InitStatus R3BSofSciTcal2SingleTcalPar::Init() {
   fh_RawPosMult1 = new TH1D*[fNumSignals];
   for(Int_t det=0; det<fNumDetectors; det++){
     sprintf(name,"PosRaw_Sci%i",det+1);
-    fh_RawPosMult1[det] = new TH1D(name,name,100000,-5000,5000);
+    fh_RawPosMult1[det] = new TH1D(name,name,20000,-10,10);
   }
   
 #if NUMBER_OF_DETECTORS==2
@@ -219,7 +219,7 @@ void R3BSofSciTcal2SingleTcalPar::ExecRawPos() {
 // ------------------------------
 void R3BSofSciTcal2SingleTcalPar::CalculateRawPosSingleTcalParams()
 {
-  LOG(INFO) << "R3BSofSciTcal2SingleTcalPar: CalculateVftxSingleTcalParams()";
+  LOG(INFO) << "R3BSofSciTcal2SingleTcalPar: CalculateRawPosSingleTcalParams()";
   
   fSingleTcalPar->SetNumDetectors(fNumDetectors);
   fSingleTcalPar->SetNumSignals(fNumDetectors);
@@ -233,16 +233,16 @@ void R3BSofSciTcal2SingleTcalPar::CalculateRawPosSingleTcalParams()
       //LOWER LIMIT
       bin=1;
       binLimit=1;
-      while ((bin<=fh_RawPosMult1[sig]->GetNbinsX())||(binLimit>1)){
-	if(fh_RawPosMult1[sig]->GetBinContent(bin)>iMax/10000.) binLimit=bin;
+      while ((bin<=fh_RawPosMult1[sig]->GetNbinsX())&&(binLimit==1)){
+	if(fh_RawPosMult1[sig]->GetBinContent(bin)>(iMax/10000.)) binLimit=bin;
 	bin++;
       }
       fSingleTcalPar->SetSignalParams(fh_RawPosMult1[sig]->GetBinLowEdge(binLimit),sig*2);
       //HIGHER LIMIT
       bin=fh_RawPosMult1[sig]->GetNbinsX();
       binLimit=fh_RawPosMult1[sig]->GetNbinsX();
-      while ((bin>=1)||(binLimit<fh_RawPosMult1[sig]->GetNbinsX())){
-	if(fh_RawPosMult1[sig]->GetBinContent(bin)>iMax/10000.) binLimit=bin;
+      while ((bin>=1)&&(binLimit==fh_RawPosMult1[sig]->GetNbinsX())){
+	if(fh_RawPosMult1[sig]->GetBinContent(bin)>(iMax/10000.)) binLimit=bin;
 	bin--;
       }
       fSingleTcalPar->SetSignalParams(fh_RawPosMult1[sig]->GetBinLowEdge(binLimit),sig*2+1);
@@ -268,6 +268,7 @@ void R3BSofSciTcal2SingleTcalPar::ExecRawTof()
 // ------------------------------
 void R3BSofSciTcal2SingleTcalPar::CalculateRawTofSingleTcalParams()
 {
+  LOG(INFO) << "R3BSofSciTcal2SingleTcalPar: CalculateRawTofSingleTcalParams()";
   // TO DO 
 }
 

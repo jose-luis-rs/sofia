@@ -28,7 +28,8 @@ void calib02_rawpos_Sci(Int_t First=1320)
 
   EXT_STR_h101 ucesb_struct;
   R3BUcesbSource* source = new R3BUcesbSource(filename, ntuple_options,ucesb_path, &ucesb_struct, sizeof(ucesb_struct));
-  source->SetMaxEvents(nev);
+  //source->SetMaxEvents(nev);
+  source->SetMaxEvents(max_events_ucesb);
   source->AddReader(new R3BUnpackReader((EXT_STR_h101_unpack_t *)&ucesb_struct,offsetof(EXT_STR_h101, unpack)));
   source->AddReader(new R3BSofSciReader((EXT_STR_h101_SOFSCI_t *)&ucesb_struct.sci,offsetof(EXT_STR_h101, sci)));
     
