@@ -101,11 +101,9 @@ void eng_online()
   //Map2Cal->SetOnline(true);
   //run->AddTask(Calh);
 
-
   R3BSofMwpc2Mapped2Cal* Map2Cal = new R3BSofMwpc2Mapped2Cal();
   //Map2Cal->SetOnline(true);
   run->AddTask(Map2Cal);
-
 
   //R3BSofMwpc2Cal2Hit* Calh2 = new R3BSofMwpc2Cal2Hit();
   //Map2Cal->SetOnline(true);
@@ -113,7 +111,7 @@ void eng_online()
 
   //R3BSofMwpc3Mapped2Cal* cMap2Cal = new R3BSofMwpc3Mapped2Cal();
   //Map2Cal->SetOnline(true);
-  //run->AddTask(cMap2Cal);777
+  //run->AddTask(cMap2Cal);
 
   // --- Mapped 2 Tcal for SofSci
   R3BSofSciMapped2Tcal* SofSciMap2Tcal = new R3BSofSciMapped2Tcal();
@@ -144,6 +142,8 @@ void eng_online()
   run->AddTask(mw2online);
   //R3BSofMwpcOnlineSpectra* mw3online= new R3BSofMwpcOnlineSpectra("SofMwpc3OnlineSpectra",1,"Mwpc3");
   //run->AddTask(mw3online);
+  R3BSofSciOnlineSpectra* scionline= new R3BSofSciOnlineSpectra("SofSciOnlineSpectra",1,"Sci");
+  run->AddTask(scionline);
 
   R3BSofOnlineSpectra* sofonline= new R3BSofOnlineSpectra();
   run->AddTask(sofonline);
