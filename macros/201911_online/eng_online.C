@@ -23,11 +23,11 @@ void eng_online()
 
   // Create source using ucesb for input ------------------
 
-  TString filename = "--stream=lxir123:7803";
-  //TString filename = "~/lmd/sofia2019/main0028_00*.lmd";
+  //TString filename = "--stream=lxir123:7803";
+  TString filename = "~/lmd/sofia2019/main0028_00*.lmd";
 
-  //TString outputFileName = "data_online.root";
-  TString outputFileName = "../SofMacrosOutput/201911_online/data_online.root";
+  TString outputFileName = "data_online.root";
+  //TString outputFileName = "../SofMacrosOutput/201911_online/data_online.root";
   
   TString ntuple_options = "RAW";
   TString ucesb_dir = getenv("UCESB_DIR");
@@ -122,6 +122,7 @@ void eng_online()
   R3BSofToFWMapped2Tcal* SofToFWMap2Tcal = new R3BSofToFWMapped2Tcal();
   run->AddTask(SofToFWMap2Tcal);
   
+
   // Add online task ------------------------------------
   //R3BSofAtOnlineSpectra* atonline= new R3BSofAtOnlineSpectra();
   //run->AddTask(atonline);
