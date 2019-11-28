@@ -23,7 +23,6 @@ R3BSofSciTcal2SingleTcal::~R3BSofSciTcal2SingleTcal()
 {
   if(fSingleTcal){
     delete fSingleTcal;
-    fSingleTcal=NULL;
   }
 }
 
