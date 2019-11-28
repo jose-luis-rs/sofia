@@ -6178,3 +6178,15 @@ nDetectorsTcalPar:  Int_t  28
 nChannelsTcalPar:  Int_t  2 
 nSignalsTcalPar:  Int_t  56 
 nTcalParsPerSignal:  Int_t  1000 
+##############################################################################
+##############################################################################
+# Class:   SofSciSingleTcalPar
+# Context: SofSciParContext
+##############################################################################
+[SofSciSingleTcalPar]
+//----------------------------------------------------------------------------
+SingleTcalPar:  Float_t \
+  1.172 1.421 
+nDetectorsSingleTcalPar:  Int_t  1 
+nSignalsSingleTcalPar:  Int_t  1 
+nSingleTcalParsPerSignal:  Int_t  2 
