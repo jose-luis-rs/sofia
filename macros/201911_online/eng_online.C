@@ -22,20 +22,17 @@ void eng_online()
   const Int_t nev = 1000000; // Only nev events to read  
 
   // Create source using ucesb for input ------------------
-  
-  //TString filename = "--stream=lxir123:7803";
-  //TString filename = "/media/audrey/COURGE/SOFIA/ANALYSE/SOFIA3/data/main*.lmd";
-  TString filename = "/media/audrey/COURGE/SOFIA/ANALYSE/SOFIA3/data/main0028_0001.lmd";
+
+  TString filename = "--stream=lxir123:7803";
+  //TString filename = "~/lmd/sofia2019/main0028_00*.lmd";
 
   //TString outputFileName = "data_online.root";
   TString outputFileName = "../SofMacrosOutput/201911_online/data_online.root";
   
   TString ntuple_options = "RAW";
   TString ucesb_dir = getenv("UCESB_DIR");
-  //TString ucesb_path = ucesb_dir + "/../upexps/201911_eng/201911_eng --input-buffer=100Mi";
   //TString ucesb_path = "/u/land/sofia/unpacker/upexps/201911_eng/201911_eng --input-buffer=100Mi";
   TString ucesb_path = ucesb_dir + "/../upexps/201911_eng/201911_eng --allow-errors --input-buffer=100M";
-  //TString ucesb_path = ucesb_dir + "/../upexps/201911_eng/201911_eng --input-buffer=100M";
   ucesb_path.ReplaceAll("//","/");
   
   EXT_STR_h101 ucesb_struct;
