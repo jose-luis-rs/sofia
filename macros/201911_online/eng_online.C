@@ -69,7 +69,7 @@ void eng_online()
   source->AddReader(unpackmusic);
   source->AddReader(unpacksci);
   source->AddReader(unpackmwpc);
-  source->AddReader(unpacktwim);
+  //source->AddReader(unpacktwim);
   source->AddReader(unpacktofw);
 
 
@@ -136,8 +136,8 @@ void eng_online()
 
   R3BMusicOnlineSpectra* musonline= new R3BMusicOnlineSpectra();
   run->AddTask(musonline);
-  R3BSofTwimOnlineSpectra* twonline= new R3BSofTwimOnlineSpectra();
-  run->AddTask(twonline);
+  //R3BSofTwimOnlineSpectra* twonline= new R3BSofTwimOnlineSpectra();
+  //run->AddTask(twonline);
   R3BSofMwpcOnlineSpectra* mw0online= new R3BSofMwpcOnlineSpectra("SofMwpc0OnlineSpectra",1,"Mwpc0");
   run->AddTask(mw0online);
   R3BSofMwpcOnlineSpectra* mw2online= new R3BSofMwpcOnlineSpectra("SofMwpc2OnlineSpectra",1,"Mwpc2");

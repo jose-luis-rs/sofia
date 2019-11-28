@@ -28,7 +28,6 @@ class TRandom3;
 #include "R3BSofSciMappedData.h"
 
 
-
 class R3BSofSciMapped2Tcal : public FairTask
 {
 
@@ -60,9 +59,6 @@ class R3BSofSciMapped2Tcal : public FairTask
 
  private:
   Bool_t fOnline; // Don't store data for online
-
-  UShort_t fNumDet;
-  UShort_t fNumCh;
 
   TClonesArray*  fMapped;             // input data - SofSci
   R3BSofTcalPar* fTcalPar;            // tcal parameters container - SofSci

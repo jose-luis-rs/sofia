@@ -92,16 +92,15 @@ InitStatus R3BSofSciMapped2Tcal::Init()
   // --- -------------------------- --- //
   // --- CHECK THE TCALPAR VALIDITY --- //
   // --- -------------------------- --- //
-  if(!fTcalPar){
-    LOG(ERROR) << "R3BSofSciMapped2Tcal::Init() : Could not get access to SofSciTcalPar-Container.";
-  }
   if(fTcalPar->GetNumSignals()==0){
     LOG(ERROR) << "R3BSofSciMapped2Tcal::Init() : There are no Tcal parameters for SofSci";
     return kFATAL;
   }
-  else
-    LOG(INFO) << " Number of signals for SofSci with defined tcal parameters : " << fTcalPar->GetNumSignals();
-  
+  else{
+    LOG(INFO) << "R3BSofSciMapped2Tcal::Init(): fNumSignals=" << fTcalPar->GetNumSignals();
+    LOG(INFO) << " R3BSofSciMapped2Tcal::Init(): fNumDetectors=" << fTcalPar->GetNumDetectors(); 
+    LOG(INFO) << "  R3BSofSciMapped2Tcal::Init(): fNumChannels=" << fTcalPar->GetNumChannels();
+  }
   return kSUCCESS;
 }
 
