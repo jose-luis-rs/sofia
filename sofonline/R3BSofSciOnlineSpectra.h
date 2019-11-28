@@ -24,7 +24,7 @@ class TClonesArray;
 class R3BEventHeader;
 
 /**
- * This taks reads TWIM data and plots online histograms
+ * This taks reads SCI data and plots online histograms
  */
 class R3BSofSciOnlineSpectra : public FairTask
 {
