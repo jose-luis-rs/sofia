@@ -24,15 +24,18 @@ void eng_online()
   // Create source using ucesb for input ------------------
   
   //TString filename = "--stream=lxir123:7803";
-  TString filename = "/media/audrey/COURGE/SOFIA/ANALYSE/SOFIA3/data/main0028_00*.lmd";
+  //TString filename = "/media/audrey/COURGE/SOFIA/ANALYSE/SOFIA3/data/main*.lmd";
+  TString filename = "/media/audrey/COURGE/SOFIA/ANALYSE/SOFIA3/data/main0028_0001.lmd";
 
-  TString outputFileName = "data_online.root";
+  //TString outputFileName = "data_online.root";
+  TString outputFileName = "../SofMacrosOutput/201911_online/data_online.root";
   
   TString ntuple_options = "RAW";
   TString ucesb_dir = getenv("UCESB_DIR");
   //TString ucesb_path = ucesb_dir + "/../upexps/201911_eng/201911_eng --input-buffer=100Mi";
   //TString ucesb_path = "/u/land/sofia/unpacker/upexps/201911_eng/201911_eng --input-buffer=100Mi";
-  TString ucesb_path = ucesb_dir + "/../upexps/201911_eng/201911_eng --input-buffer=100M";
+  TString ucesb_path = ucesb_dir + "/../upexps/201911_eng/201911_eng --allow-errors --input-buffer=100M";
+  //TString ucesb_path = ucesb_dir + "/../upexps/201911_eng/201911_eng --input-buffer=100M";
   ucesb_path.ReplaceAll("//","/");
   
   EXT_STR_h101 ucesb_struct;
@@ -64,7 +67,7 @@ void eng_online()
   // Add readers ------------------------------------------ 
   source->AddReader(unpackreader);
   source->AddReader(unpackmusic);
-  //source->AddReader(unpacksci);
+  source->AddReader(unpacksci);
   source->AddReader(unpackmwpc);
   source->AddReader(unpacktwim);
   source->AddReader(unpacktofw);
@@ -81,6 +84,7 @@ void eng_online()
 
   // Runtime data base ------------------------------------ 
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
+
 
   // Add analysis task ------------------------------------
 
@@ -110,6 +114,15 @@ void eng_online()
   //R3BSofMwpc3Mapped2Cal* cMap2Cal = new R3BSofMwpc3Mapped2Cal();
   //Map2Cal->SetOnline(true);
   //run->AddTask(cMap2Cal);777
+
+  // --- Mapped 2 Tcal for SofSci
+  R3BSofSciMapped2Tcal* SofSciMap2Tcal = new R3BSofSciMapped2Tcal();
+  run->AddTask(SofSciMap2Tcal);
+
+  // --- Mapped 2 Tcal for SofToFW
+  R3BSofToFWMapped2Tcal* SofToFWMap2Tcal = new R3BSofToFWMapped2Tcal();
+  run->AddTask(SofToFWMap2Tcal);
+  
 
   FairParAsciiFileIo* parIo1 = new FairParAsciiFileIo();//Ascii
   parIo1->open("./parameters/CalibParam.par","in");

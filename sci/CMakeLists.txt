@@ -29,8 +29,6 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
 #Put here your sourcefiles
-R3BSofSciMapped2TcalPar.cxx
-R3BSofSciMapped2Tcal.cxx
 R3BSofSciContFact.cxx
 R3BSofSciSingleTcalPar.cxx
 R3BSofSciTcal2SingleTcalPar.cxx
