@@ -1,24 +1,15 @@
 #include "R3BSofSciSingleTcalData.h"
 
 R3BSofSciSingleTcalData::R3BSofSciSingleTcalData()
-    : fDetector(0)
-    , fPmtLeftRawTimeNs(0)
-    , fPmtRightRawTimeNs(0)
-    , fRawTimeNs(0)
-    , fRawPosNs(0)
+  : fNumberOfDetectors(NUMBER_OF_DETECTORS)
 {
 }
 
-R3BSofSciSingleTcalData::R3BSofSciSingleTcalData(UShort_t detector, 
-						 Double_t tl, 
-						 Double_t tr,
-						 Double_t t,
-						 Double_t pos)
-    : fDetector(detector)
-    , fPmtLeftRawTimeNs(tl)
-    , fPmtRightRawTimeNs(tr)
-    , fRawTimeNs(t)
-    , fRawPosNs(pos)
+R3BSofSciSingleTcalData::R3BSofSciSingleTcalData(UShort_t ndets) 
+  : fNumberOfDetectors(ndets)
 {
 }
+
+
+
 ClassImp(R3BSofSciSingleTcalData)
