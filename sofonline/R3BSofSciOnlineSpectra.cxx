@@ -115,7 +115,7 @@ InitStatus R3BSofSciOnlineSpectra::Init()
 	fh1_finetime[i*NbChannels+j]->Draw("");
       }
       sprintf(Name1,"SofSci%i_MultPerChannel",i+1);
-      fh2_mult[i] = new TH2I(Name1,Name1,NbChannels+1,0,NbChannels+1,20,0,20);
+      fh2_mult[i] = new TH2I(Name1,Name1,NbChannels+1,-0.5,NbChannels+0.5,20,-0.5,19.5);
       fh2_mult[i]->GetXaxis()->SetTitle("channel: 1=PMT R, 2=PMT L, 3=COMMON REF");
       fh2_mult[i]->GetYaxis()->SetTitle("multiplicity per channe");
       cSciMult[i]->cd(4);
