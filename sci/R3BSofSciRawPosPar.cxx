@@ -76,7 +76,7 @@ Bool_t R3BSofSciRawPosPar::getParams(FairParamList* list)
     {
         return kFALSE;
     }
-    if (!list->fill("nChannelsRawPosPar", &fNumDetectors))
+    if (!list->fill("nChannelsRawPosPar", &fNumChannels))
     {
         return kFALSE;
     }
