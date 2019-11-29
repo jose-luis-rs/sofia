@@ -18,8 +18,8 @@ void eng_online()
   TStopwatch timer;
   timer.Start();
   
-  const Int_t nev = -1; // number of events to read, -1 - until CTRL+C
-  //const Int_t nev = 10; // Only 10 events to read  
+  //const Int_t nev = -1; // number of events to read, -1 - until CTRL+C
+  const Int_t nev = 1000000; // Only nev events to read  
 
   // Create source using ucesb for input ------------------
   

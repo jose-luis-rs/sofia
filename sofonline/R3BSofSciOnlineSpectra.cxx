@@ -107,7 +107,7 @@ InitStatus R3BSofSciOnlineSpectra::Init()
       // === FINE TIME AND MULT === //
       sprintf(Name1, "SofSci%i_MultAndFt",i+1);
       cSciMult[i] = new TCanvas(Name1, Name1, 10, 10, 800, 700);
-      cSciMult[i]->Divide(4, 4);
+      cSciMult[i]->Divide(2,2);
       for (Int_t j = 0; j < NbChannels; j++)    {
 	sprintf(Name1, "SofSci%i_FineTimeCh%i",i+1,j+1);
 	fh1_finetime[i*NbChannels+j] = new TH1I(Name1,Name1,1000,0,1000);
@@ -118,6 +118,8 @@ InitStatus R3BSofSciOnlineSpectra::Init()
       fh2_mult[i] = new TH2I(Name1,Name1,NbChannels+1,0,NbChannels+1,20,0,20);
       fh2_mult[i]->GetXaxis()->SetTitle("channel: 1=PMT R, 2=PMT L, 3=COMMON REF");
       fh2_mult[i]->GetYaxis()->SetTitle("multiplicity per channe");
+      cSciMult[i]->cd(4);
+      fh2_mult[i]->Draw("COL");
 
       // === RAW POSITION === //
       sprintf(Name1,"SofSci%i_RawPos",i+1);
