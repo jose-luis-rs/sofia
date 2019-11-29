@@ -24,6 +24,9 @@ class R3BSofSciSingleTcalData : public TObject
 #if NUMBER_OF_DETECTORS==2
     inline const Double_t& GetRawTofNs()                    const { return fRawTofNs;}
 #endif
+    //#if NUMBER_OF_DETECTORS>1
+    //inline const Double_t& GetRawTofNs(rank)        const { return fRawTofNs[rank];}
+    //#endif
 
     // Modifiers
     void SetNumberofDetectors(UShort_t nDets)       {fNumberOfDetectors=nDets;}
@@ -32,6 +35,7 @@ class R3BSofSciSingleTcalData : public TObject
 #if NUMBER_OF_DETECTORS==2
     void SetRawTofNs(Double_t tof)                  {fRawTofNs=tof;}
 #endif
+    void SetMultPerDet(UShort_t det, UShort_t m)    {fMultPerDet[det-1]=m;}
 
   private:
     UShort_t fNumberOfDetectors; 
@@ -40,6 +44,10 @@ class R3BSofSciSingleTcalData : public TObject
 #if NUMBER_OF_DETECTORS==2
     Double_t fRawTofNs;
 #endif
+    //#if NUMBER_OF_DETECTORS>1
+    //Double_t fRawTofNs[Fact(n)/(Fact(2)*Fact(n-2))];
+    //#endif
+    UShort_t fMultPerDet[NUMBER_OF_DETECTORS];        // number of hits with the proper pos (and ToF is NUMBER_OF_DETECTORS==2)
   public:
     ClassDef(R3BSofSciSingleTcalData, 2)
 };

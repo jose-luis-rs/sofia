@@ -10,6 +10,4 @@ R3BSofSciSingleTcalData::R3BSofSciSingleTcalData(UShort_t ndets)
 {
 }
 
-
-
 ClassImp(R3BSofSciSingleTcalData)

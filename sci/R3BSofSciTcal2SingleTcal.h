@@ -8,7 +8,7 @@
 
 #include "FairTask.h"
 
-#include "R3BSofSingleTcalPar.h"
+#include "R3BSofSciRawPosPar.h"
 #include "R3BSofSciSingleTcalData.h"
 
 #include "TClonesArray.h"
@@ -38,7 +38,7 @@ class R3BSofSciTcal2SingleTcal : public FairTask
 
  private:
   TClonesArray*  fTcal;            
-  R3BSofSciSingleTcalPar* fRawPosPar;          
+  R3BSofSciRawPosPar* fRawPosPar;          
   TClonesArray*  fSingleTcal;         
   
   UInt_t fNumSingleTcal;     

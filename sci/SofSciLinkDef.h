@@ -11,5 +11,7 @@
 #pragma link C++ class R3BSofSciRawPosPar+;
 #pragma link C++ class R3BSofSciTcal2RawPosPar+;
 
+#pragma link C++ class R3BSofSciTcal2SingleTcal+;
+
 
 #endif

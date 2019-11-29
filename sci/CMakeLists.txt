@@ -32,6 +32,7 @@ set(SRCS
 R3BSofSciContFact.cxx
 R3BSofSciRawPosPar.cxx
 R3BSofSciTcal2RawPosPar.cxx
+R3BSofSciTcal2SingleTcal.cxx
 )
 
 # fill list of header files from list of source files

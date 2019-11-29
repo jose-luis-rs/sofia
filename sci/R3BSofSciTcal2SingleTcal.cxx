@@ -1,5 +1,5 @@
 #include "R3BSofSciTcal2SingleTcal.h"
-#include "R3BSofSciMappedData.h"
+#include "R3BSofSciTcalData.h"
 
 #include "FairRunAna.h"
 #include "FairRunOnline.h"
@@ -32,13 +32,13 @@ R3BSofSciTcal2SingleTcal::~R3BSofSciTcal2SingleTcal()
 
 void R3BSofSciTcal2SingleTcal::SetParContainers()
 {
-  fRawPosPar = (R3BSofSciSingleTcalPar*)FairRuntimeDb::instance()->getContainer("SofSciSingleTcalPar");
+  fRawPosPar = (R3BSofSciRawPosPar*)FairRuntimeDb::instance()->getContainer("SofSciRawPosPar");
   if (!fRawPosPar){
-    LOG(ERROR) << "R3BSofSciTcal2SingleTcal::SetParContainers() : Could not get access to SofSciSingleTcalPar-Container.";
+    LOG(ERROR) << "R3BSofSciTcal2SingleTcal::SetParContainers() : Could not get access to SofSciRawPosPar-Container.";
     return;
   }
   else
-    LOG(INFO) << "R3BSofSciTcal2SingleTcal::SetParContainers() : SofSciTcalPar-Container found with " << fRawPosPar->GetNumSignals() << " signals";
+    LOG(INFO) << "R3BSofSciTcal2SingleTcal::SetParContainers() : SofSciRawPosPar-Container found with " << fRawPosPar->GetNumSignals() << " signals";
 }
 
 InitStatus R3BSofSciTcal2SingleTcal::Init()
@@ -65,15 +65,14 @@ InitStatus R3BSofSciTcal2SingleTcal::Init()
   else
     LOG(INFO) << " R3BSofSciTcal2SingleTcal::Init() SofSciTcalData items found";
 
-
   // --- ----------------------- --- //
   // --- OUTPUT SINGLE TCAL DATA --- //
   // --- ----------------------- --- //
   
   // Register output array in tree
   fSingleTcal = new TClonesArray("R3BSofSciSingleTcalData");
-  rm->Register("SofSciTcalData","SofSci", fSingleTcal, kTRUE);
-  LOG(INFO) << "R3BSofSciMapped2Tcal::Init() R3BSofSciSingleTcalData items created";
+  rm->Register("SofSciSingleTcalData","SofSci", fSingleTcal, kTRUE);
+  LOG(INFO) << "R3BSofSciTcal2SingleTcal::Init() R3BSofSciSingleTcalData items created";
 
   // --- -------------------------- --- //
   // --- CHECK THE TCALPAR VALIDITY --- //
@@ -101,10 +100,13 @@ InitStatus R3BSofSciTcal2SingleTcal::ReInit()
 
 void R3BSofSciTcal2SingleTcal::Exec(Option_t* option)
 {
+
+  int nDets = int(fRawPosPar->GetNumDetectors());
+  int nChs = int(fRawPosPar->GetNumChannels());
   UShort_t iDet; // 0-based
   UShort_t iCh;  // 0-based
-  Double_t iTraw[fRawPosPar->GetNumDetectors][16];
-  UShort_t mult[fRawPosPar->GetNumDetectors*3];  // 3 channels per SofSci 
+  Double_t iTraw[nDets][16];
+  UShort_t mult[nDets*nChs];
   UShort_t mult_max=0;
   
   Int_t nHitsPerEvent_SofSci = fTcal->GetEntries();
@@ -112,41 +114,63 @@ void R3BSofSciTcal2SingleTcal::Exec(Option_t* option)
     R3BSofSciTcalData* hit = (R3BSofSciTcalData*)fTcal->At(ihit);
     if(!hit)             continue;
     if(hit->GetPmt()==2) continue; // no interest HERE for the Common reference
-    if(mult_max)>10      continue; // events with a multiplicity in a Pmt higher than 10 are discarded
+    if(mult_max>16)      continue; // if multiplicity in a Pmt is higher than 16 are discarded, this code cannot handle it
 
     iDet  = hit->GetDetector()-1;
     iCh   = hit->GetPmt()-1;
-    iTraw[iDet*3+iCh][mult[iDet*3+iCh]] = hit->GetTimeRawNs();
-    mult[iDet*3+iCh]++;
-    if (mult[iDet*3+iCh]>mult_max) mult_max=mult[iDet*2+iCh];
+    iTraw[iDet*nChs+iCh][mult[iDet*nChs+iCh]] = hit->GetRawTimeNs();
+    mult[iDet*nChs+iCh]++;
+    if (mult[iDet*nChs+iCh]>mult_max) mult_max=mult[iDet*nChs+iCh];
   }// end of loop over the TClonesArray of Tcal data
   
   // LOOP OVER THE ENTRIES TO GET ALL THE POSSIBLE COMBINATION AND TO FIND THE GOOD ONE WITHOUT DOUBLE COUNTS
-  UShort_t maskR; // if mult_max>16, change into UInt_t
+  UShort_t maskR; // if mult_max>  16, change into UInt_t
   UShort_t maskL; // if mult_max>16, change into UInt_t
-  Double_t iRawPos[fRawPosPar->GetNumDetectors()];
-  Double_t iRawTime[fRawPosPar->GetNumDetectors()];
-  for(UShort_t d=0; d<fRawPosPar->GetNumDetectors();d++) {
+  Double_t iRawPos;
+  Double_t RawPos[nDets];
+  Double_t RawTime[nDets];
+  UShort_t mult_selectHits[nDets];
+  for(UShort_t d=0; d<nDets;d++) {
     maskR= 0x0;
     maskL= 0x0;
-    iRawPos[d] = -1000000.;
-    iRawTime[d] = -1000000.;
-    for(UShort_t multr=0; multr<mult[d*2]; multr++){
-      for(UShort_t multl=0; multl<mult[d*2+1],multl++){
-	iRawPos[d] = iTraw[multl]-iTraw[multr]; // Raw position = Tleft - Tright
+    RawPos[d] = -1000000.;
+    RawTime[d] = -1000000.;
+    mult_selectHits[d] = 0;
+    for(UShort_t multR=0; multR<mult[d*nChs]; multR++){
+      for(UShort_t multL=0; multL<mult[d*nChs+1];multL++){
+	iRawPos = iTraw[d*nChs+1][multL]-iTraw[d*nChs][multR]; // Raw position = Tleft - Tright
 	if((fRawPosPar->GetSignalTcalParams(0)<=iRawPos)&&(iRawPos<=fRawPosPar->GetSignalTcalParams(1))){
-	  // data used, do not use it later
-	  // calculate the iRawTime
-	  iRawTime = 0.5*(iTraw[multl]+iTraw[multr]);
-	}
-      }
-    }
-
+	  // if this hit has already been used, continue
+	  if((((maskR>>multR)&(0x1))==0) && (((maskL>multL)&(0x1))==0)){
+	    // get the RawPos of the detector
+	    RawPos[d] = iRawPos;
+	    // calculate the iRawTime
+	    RawTime[d] = 0.5*(iTraw[d*nChs][multL]+iTraw[d*nChs+1][multR]);
+	    //tag which hit is used
+	    maskR |= (0x1)<<multR;
+	    maskL |= (0x1)<<multL;
+	    //implement how many "good event" is found
+	    // attention for a single detector at S2, this might not be sufficient if the searching window of the VFTX is too large
+	    mult_selectHits[d]++;
+	  }// end of check if this hit hasn't been already used
+	}// end of if(good raw position)
+      }// end of loop over the hits of the left PMTs
+    }// end of loop over the hits of the right PMTs
+  }
+  
+  // ATTENTION : WE ONLY TAKE THE LAST VALUE OF THE RawPos WHEN SEVERAL OPTIONS ARE POSSIBLES
+  // WITHOUT OTHER DETECTORS AT S2, THIS CAN HAPPENS THAT FOR HIGH RATE OR TOO LARGE SEARCHING WINDOW, WE CANNOT DISCRIMINATE LIKE THIS AND EVENT HAS TO BE DISCARDED
+  R3BSofSciSingleTcalData * fItem =  new((*fSingleTcal)[fNumSingleTcal++]) R3BSofSciSingleTcalData(nDets);  
+  for(UShort_t d=0; d<nDets; d++){
+    fItem->SetRawTimeNs(d+1,RawTime[d]);
+    fItem->SetRawPosNs(d+1,RawPos[d]);
+    //#if NUMBER_OF_DETECTORS==2
+    //fItem->SetRawTof(RawTof);
+    //#endif
+    fItem->SetMultPerDet(d,mult_selectHits[d]);
   }
 
-
   ++fNevent;
-
 }  
 
 
