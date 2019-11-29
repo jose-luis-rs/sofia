@@ -33,6 +33,8 @@ class R3BSofSciTcal2SingleTcal : public FairTask
   virtual void SetParContainers();
   virtual InitStatus ReInit();
   virtual void Exec(Option_t* option);
+  virtual void ExecRawPos();
+  //virtual void ExecRawTof(); // need to be done when SofSci at S2
   virtual void FinishEvent();
   virtual void FinishTask();
   Double_t CalculateRawPosNs(UInt_t tlns, UInt_t trns);
@@ -40,10 +42,10 @@ class R3BSofSciTcal2SingleTcal : public FairTask
 
  private:
   TClonesArray*  fTcal;            
-  R3BSofTcalPar* fSingleTcalPar;          
+  R3BSofTcalPar* fRawPosPar;          
   TClonesArray*  fSingleTcal;         
   
-  UInt_t fNumTcalItems;               // number of Tcal items per event
+  UInt_t fNumSingleTcal;     
 
   UInt_t fNevent;
 

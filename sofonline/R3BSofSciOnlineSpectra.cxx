@@ -116,13 +116,23 @@ InitStatus R3BSofSciOnlineSpectra::Init()
       }
       sprintf(Name1,"SofSci%i_MultPerChannel",i+1);
       fh2_mult[i] = new TH2I(Name1,Name1,NbChannels+1,0,NbChannels+1,20,0,20);
+      fh2_mult[i]->GetXaxis()->SetTitle("channel: 1=PMT R, 2=PMT L, 3=COMMON REF");
+      fh2_mult[i]->GetYaxis()->SetTitle("multiplicity per channe");
 
       // === RAW POSITION === //
       sprintf(Name1,"SofSci%i_RawPos",i+1);
       cSciRawPos[i] = new TCanvas(Name1, Name1, 10, 10, 500, 500);
       sprintf(Name1,"SofSci%i_RawPosAtTcal_Mult1",i+1);
-      fh1_RawPos_AtTcalMult1[i] = new TH1F(Name1,Name1,1000,-5,5);
-      cSciMult[i]->cd();
+      fh1_RawPos_AtTcalMult1[i] = new TH1F(Name1,Name1,10000,-5,5);
+      fh1_RawPos_AtTcalMult1[i]->GetXaxis()->SetTitle("Raw position [ns with one bin/ps]");
+      fh1_RawPos_AtTcalMult1[i]->GetYaxis()->SetTitle("Counts per bin");
+      fh1_RawPos_AtTcalMult1[i]->GetXaxis()->CenterTitle(true);
+      fh1_RawPos_AtTcalMult1[i]->GetYaxis()->CenterTitle(true);
+      fh1_RawPos_AtTcalMult1[i]->GetXaxis()->SetLabelSize(0.045);
+      fh1_RawPos_AtTcalMult1[i]->GetXaxis()->SetTitleSize(0.045);
+      fh1_RawPos_AtTcalMult1[i]->GetYaxis()->SetLabelSize(0.045);
+      fh1_RawPos_AtTcalMult1[i]->GetYaxis()->SetTitleSize(0.045);
+      cSciRawPos[i]->cd();
       fh1_RawPos_AtTcalMult1[i]->Draw("");
     }
 

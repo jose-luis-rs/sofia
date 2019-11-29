@@ -11,6 +11,11 @@
 
 static R3BSofSciContFact gR3BSofSciContFact;
 
+// TO DO :
+//     CHANGE SOFSCISINGLETCALPAR INTO SOFSCIRAWPOSPAR 
+//     CREATE SOFSCIRAWTOFPAR
+
+
 R3BSofSciContFact::R3BSofSciContFact()
 {
     // Constructor (called when the library is loaded)
@@ -26,9 +31,6 @@ void R3BSofSciContFact::setAllContainers()
     /** Creates the Container objects with all accepted contexts and adds them to
      *  the list of containers for the STS library.*/
 
-    // --- --------------------------------------------------------------------------- --- //
-    // --- for the hit finder in the scintillator at cave C when no scintillator at S2 --- //
-    // --- --------------------------------------------------------------------------- --- //
     FairContainer* p1 = new FairContainer("SofSciSingleTcalPar", "Sof Sci Parameters", "SofSciParContext");
     p1->addContext("SofSciParContext");
     containers->Add(p1);

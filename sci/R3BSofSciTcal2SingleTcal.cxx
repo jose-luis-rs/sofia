@@ -11,9 +11,9 @@
 R3BSofSciTcal2SingleTcal::R3BSofSciTcal2SingleTcal()
   : FairTask("R3BSofSciTcal2SingleTcal",1)
   , fTcal(NULL)
-  , fSingleTcalPar(NULL)
+  , fRawPosPar(NULL)
   , fSingleTcal(new TClonesArray("R3BSofSciTcalData"))
-  , fNumTcal(0)
+  , fNumSingleTcal(0)
   , fNevent(0)
 {
 }
@@ -78,8 +78,8 @@ InitStatus R3BSofSciTcal2SingleTcal::Init()
 
 void R3BSofSciTcal2SingleTcal::SetParContainers()
 {
-  fSingleTcalPar = (R3BSofSingleTcalPar*)FairRuntimeDb::instance()->getContainer("SofSciTcalPar");
-  if (!fSingleTcalPar){
+  fRawPosPar = (R3BSofSingleTcalPar*)FairRuntimeDb::instance()->getContainer("SofSingleSciTcalPar");
+  if (!fRawPosPar){
     LOG(ERROR) << "R3BSofSciTcal2SingleTcal::SetParContainers() : Could not get access to SofSciTcalPar-Container.";
     return;
   }
@@ -97,26 +97,31 @@ InitStatus R3BSofSciTcal2SingleTcal::ReInit()
 
 void R3BSofSciTcal2SingleTcal::Exec(Option_t* option)
 {
+  ExecRawPos();
+}
   
+void R3BSofSciTcal2SingleTcal::ExecRawPos()
   UShort_t iDet; // 0-based
   UShort_t iCh;  // 0-based
-  Double_t iTraw;
+  Double_t iTraw[fTcal->GetNumDetectors][10];
   UShort_t mult[fTcal->GetNumDetectors*2]; // 2 pmt per plastic
-  UShort_t mult_max;
+  UShort_t mult_max=0;
 
   Int_t nHitsPerEvent_SofSci = fTcal->GetEntries();
   for(int ihit=0; ihit<nHitsPerEvent_SofSci; ihit++){
     R3BSofSciTcalData* hit = (R3BSofSciTcalData*)fTcal->At(ihit);
-    if(!hit) continue;
-    if(hit->GetPmt()==2) contiue; // no interest for the Common reference
+    if(!hit)             continue;
+    if(hit->GetPmt()==2) continue; // no interest HERE for the Common reference
+    if(mult_max)>10      continue; // events with a multiplicity in a Pmt higher than 10 are discarded
 
     iDet  = hit->GetDetector()-1;
     iCh   = hit->GetPmt()-1;
-    iTraw = hit->GetTimeRawNs();
+    iTraw[iDet*2+iCh][mult[iDet*2+iCh]] = hit->GetTimeRawNs();
     mult[iDet*2+iCh]++;
-  }
-    
-  // TO DO : LOOP OVER THE ENTRIES TO GET ALL THE POSSIBLE COMBINATUION AND TO FIND THE GOOD ONE
+    if (mult[iDet*2+iCh]>mult_max) mult_max=mult[iDet*2+iCh];
+  }// end of loop over the TClonesArray of Tcal data
+  
+  // TO DO : LOOP OVER THE ENTRIES TO GET ALL THE POSSIBLE COMBINATION AND TO FIND THE GOOD ONE WITHOUT DOUBLE COUNTS
 
   ++fNevent;
 
@@ -135,7 +140,7 @@ Double_t R3BSofSciTcal2SingleTcal::CalculateRawTime(UInt_t tlns, UInt_t trns)
 void R3BSofSciTcal2SingleTcal::FinishEvent()
 {
   fSingleTcal->Clear();
-  fNumTcal = 0;
+  fNumSingleTcal = 0;
 }
 
 
