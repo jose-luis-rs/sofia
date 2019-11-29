@@ -66,7 +66,7 @@ void eng_online()
   source->AddReader(unpackmusic);
   source->AddReader(unpacksci);
   source->AddReader(unpackmwpc);
-  //source->AddReader(unpacktwim);
+  source->AddReader(unpacktwim);
   source->AddReader(unpacktofw);
 
 
@@ -101,6 +101,10 @@ void eng_online()
   //R3BSofMwpc0Cal2Hit* Calh = new R3BSofMwpc0Cal2Hit();
   //Map2Cal->SetOnline(true);
   //run->AddTask(Calh);
+
+  //TWIM
+  R3BSofTwimMapped2Cal* TwimMap2Cal = new R3BSofTwimMapped2Cal();
+  run->AddTask(TwimMap2Cal);
 
   R3BSofMwpc2Mapped2Cal* Map2Cal = new R3BSofMwpc2Mapped2Cal();
   //Map2Cal->SetOnline(true);
