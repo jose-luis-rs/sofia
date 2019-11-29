@@ -24,7 +24,7 @@ void calib02_rawpos_Sci(Int_t First=1320)
   TString ucesb_path = ucesb_dir + "/../upexps/201911_eng/201911_eng --allow-errors --input-buffer=100M";
   ucesb_path.ReplaceAll("//","/");
   TString ntuple_options = "RAW";
-  TString outputFileNamePar = "../SofMacrosOutput/201911_online/Parameters/tcal2singletcal_Sci";
+  TString outputFileNamePar = "../SofMacrosOutput/201911_online/Parameters/tcal2rawpos_Sci";
 
   EXT_STR_h101 ucesb_struct;
   R3BUcesbSource* source = new R3BUcesbSource(filename, ntuple_options,ucesb_path, &ucesb_struct, sizeof(ucesb_struct));
@@ -54,11 +54,12 @@ void calib02_rawpos_Sci(Int_t First=1320)
   R3BSofSciMapped2Tcal* SofSciMap2Tcal = new R3BSofSciMapped2Tcal();
   run->AddTask(SofSciMap2Tcal);
 
-  // === Tcal2SingleTcal for SofSci === //
+  // === Tcal2RawPos for SofSci === //
   R3BSofSciContFact needToConstructSofSciContFact;
-  R3BSofSciTcal2SingleTcalPar* sci_calibrator = new R3BSofSciTcal2SingleTcalPar("R3BSofSciTcal2SingleTcalPar");
+  R3BSofSciTcal2RawPosPar* sci_calibrator = new R3BSofSciTcal2RawPosPar("R3BSofSciTcal2RawPosPar");
   sci_calibrator->SetNumDetectors(1); 
-  sci_calibrator->SetNumSignals(1);
+  sci_calibrator->SetNumChannels(3);
+  sci_calibrator->SetNumSignals();
   sci_calibrator->SetNumParsPerSignal(2);
   sci_calibrator->SetMinStatistics(10000);
   run->AddTask(sci_calibrator);

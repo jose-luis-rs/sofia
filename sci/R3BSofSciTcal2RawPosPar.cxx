@@ -67,6 +67,7 @@ R3BSofSciTcal2RawPosPar::R3BSofSciTcal2RawPosPar()
 R3BSofSciTcal2RawPosPar::R3BSofSciTcal2RawPosPar(const char* name, Int_t iVerbose) 
   : FairTask(name, iVerbose)
   , fNumDetectors(NUMBER_OF_DETECTORS)
+  , fNumChannels(NUMBER_OF_CHANNELS)
   , fNumSignals(NUMBER_OF_SIGNALS)
   , fNumParsPerSignal(2)
   , fMinStatistics(0)
@@ -209,6 +210,7 @@ void R3BSofSciTcal2RawPosPar::CalculateRawPosRawPosParams()
   LOG(INFO) << "R3BSofSciTcal2RawPosPar: CalculateRawPosRawPosParams()";
   
   fRawPosPar->SetNumDetectors(fNumDetectors);
+  fRawPosPar->SetNumChannels(fNumChannels);
   fRawPosPar->SetNumSignals(fNumDetectors);
   fRawPosPar->SetNumParsPerSignal(fNumParsPerSignal);
 
