@@ -21,11 +21,25 @@ R3BSofSciTcal2SingleTcal::R3BSofSciTcal2SingleTcal()
 
 R3BSofSciTcal2SingleTcal::~R3BSofSciTcal2SingleTcal()
 {
+  if(fTcal){
+    delete fTcal;
+  }
   if(fSingleTcal){
     delete fSingleTcal;
   }
 }
 
+
+void R3BSofSciTcal2SingleTcal::SetParContainers()
+{
+  fRawPosPar = (R3BSofSciSingleTcalPar*)FairRuntimeDb::instance()->getContainer("SofSciSingleTcalPar");
+  if (!fRawPosPar){
+    LOG(ERROR) << "R3BSofSciTcal2SingleTcal::SetParContainers() : Could not get access to SofSciSingleTcalPar-Container.";
+    return;
+  }
+  else
+    LOG(INFO) << "R3BSofSciTcal2SingleTcal::SetParContainers() : SofSciTcalPar-Container found with " << fRawPosPar->GetNumSignals() << " signals";
+}
 
 InitStatus R3BSofSciTcal2SingleTcal::Init()
 {
@@ -38,9 +52,9 @@ InitStatus R3BSofSciTcal2SingleTcal::Init()
     return kFATAL;
   }
 
-  // --- ----------------- --- //
-  // --- INPUT MAPPED DATA --- //
-  // --- ----------------- --- //
+  // --- --------------- --- //
+  // --- INPUT TCAL DATA --- //
+  // --- --------------- --- //
 
   // scintillator at S2 and cave C
   fTcal = (TClonesArray*)rm->GetObject("SofSciTcalData");  
@@ -50,42 +64,32 @@ InitStatus R3BSofSciTcal2SingleTcal::Init()
   }
   else
     LOG(INFO) << " R3BSofSciTcal2SingleTcal::Init() SofSciTcalData items found";
+
+
+  // --- ----------------------- --- //
+  // --- OUTPUT SINGLE TCAL DATA --- //
+  // --- ----------------------- --- //
   
+  // Register output array in tree
+  fSingleTcal = new TClonesArray("R3BSofSciSingleTcalData");
+  rm->Register("SofSciTcalData","SofSci", fSingleTcal, kTRUE);
+  LOG(INFO) << "R3BSofSciMapped2Tcal::Init() R3BSofSciSingleTcalData items created";
 
   // --- -------------------------- --- //
   // --- CHECK THE TCALPAR VALIDITY --- //
   // --- -------------------------- --- //
-  if(fSingleTcalPar->GetNumSignals()==0){
+  if(fRawPosPar->GetNumSignals()==0){
     LOG(ERROR) << " There are no Tcal parameters for SofSci";
     return kFATAL;
   }
   else
-    LOG(INFO) << " Number of signals for SofSci with defined tcal parameters : " << fSingleTcalPar->GetNumSignals();
-  
-
-  // --- ---------------- --- //
-  // --- OUTPUT TCAL DATA --- //
-  // --- ---------------- --- //
-  
-  // Register output array in tree
-  rm->Register("SofSciTcalData","SofSci", fSingleTcal, kTRUE);
+    LOG(INFO) << " Number of signals for SofSci with defined tcal parameters : " << fRawPosPar->GetNumSignals();
 
   LOG(INFO) << "R3BSofSciTcal2SingleTcal: Init DONE !";
 
   return kSUCCESS;
 }
 
-
-void R3BSofSciTcal2SingleTcal::SetParContainers()
-{
-  fRawPosPar = (R3BSofSingleTcalPar*)FairRuntimeDb::instance()->getContainer("SofSingleSciTcalPar");
-  if (!fRawPosPar){
-    LOG(ERROR) << "R3BSofSciTcal2SingleTcal::SetParContainers() : Could not get access to SofSciTcalPar-Container.";
-    return;
-  }
-  else
-    LOG(INFO) << "R3BSofSciTcal2SingleTcal::SetParContainers() : SofSciTcalPar-Container found with " << fSingleTcalPar->GetNumSignals() << " signals";
-}
 
 
 InitStatus R3BSofSciTcal2SingleTcal::ReInit()
@@ -97,16 +101,12 @@ InitStatus R3BSofSciTcal2SingleTcal::ReInit()
 
 void R3BSofSciTcal2SingleTcal::Exec(Option_t* option)
 {
-  ExecRawPos();
-}
-  
-void R3BSofSciTcal2SingleTcal::ExecRawPos()
   UShort_t iDet; // 0-based
   UShort_t iCh;  // 0-based
-  Double_t iTraw[fTcal->GetNumDetectors][10];
-  UShort_t mult[fTcal->GetNumDetectors*2]; // 2 pmt per plastic
+  Double_t iTraw[fRawPosPar->GetNumDetectors][16];
+  UShort_t mult[fRawPosPar->GetNumDetectors*3];  // 3 channels per SofSci 
   UShort_t mult_max=0;
-
+  
   Int_t nHitsPerEvent_SofSci = fTcal->GetEntries();
   for(int ihit=0; ihit<nHitsPerEvent_SofSci; ihit++){
     R3BSofSciTcalData* hit = (R3BSofSciTcalData*)fTcal->At(ihit);
@@ -116,26 +116,41 @@ void R3BSofSciTcal2SingleTcal::ExecRawPos()
 
     iDet  = hit->GetDetector()-1;
     iCh   = hit->GetPmt()-1;
-    iTraw[iDet*2+iCh][mult[iDet*2+iCh]] = hit->GetTimeRawNs();
-    mult[iDet*2+iCh]++;
-    if (mult[iDet*2+iCh]>mult_max) mult_max=mult[iDet*2+iCh];
+    iTraw[iDet*3+iCh][mult[iDet*3+iCh]] = hit->GetTimeRawNs();
+    mult[iDet*3+iCh]++;
+    if (mult[iDet*3+iCh]>mult_max) mult_max=mult[iDet*2+iCh];
   }// end of loop over the TClonesArray of Tcal data
   
-  // TO DO : LOOP OVER THE ENTRIES TO GET ALL THE POSSIBLE COMBINATION AND TO FIND THE GOOD ONE WITHOUT DOUBLE COUNTS
+  // LOOP OVER THE ENTRIES TO GET ALL THE POSSIBLE COMBINATION AND TO FIND THE GOOD ONE WITHOUT DOUBLE COUNTS
+  UShort_t maskR; // if mult_max>16, change into UInt_t
+  UShort_t maskL; // if mult_max>16, change into UInt_t
+  Double_t iRawPos[fRawPosPar->GetNumDetectors()];
+  Double_t iRawTime[fRawPosPar->GetNumDetectors()];
+  for(UShort_t d=0; d<fRawPosPar->GetNumDetectors();d++) {
+    maskR= 0x0;
+    maskL= 0x0;
+    iRawPos[d] = -1000000.;
+    iRawTime[d] = -1000000.;
+    for(UShort_t multr=0; multr<mult[d*2]; multr++){
+      for(UShort_t multl=0; multl<mult[d*2+1],multl++){
+	iRawPos[d] = iTraw[multl]-iTraw[multr]; // Raw position = Tleft - Tright
+	if((fRawPosPar->GetSignalTcalParams(0)<=iRawPos)&&(iRawPos<=fRawPosPar->GetSignalTcalParams(1))){
+	  // data used, do not use it later
+	  // calculate the iRawTime
+	  iRawTime = 0.5*(iTraw[multl]+iTraw[multr]);
+	}
+      }
+    }
+
+  }
+
 
   ++fNevent;
 
 }  
 
-Double_t R3BSofSciTcal2SingleTcal::CalculateRawPos(UInt_t tlns, UInt_t trns)
-{
-  return(tlns-trns);
-}
 
-Double_t R3BSofSciTcal2SingleTcal::CalculateRawTime(UInt_t tlns, UInt_t trns)
-{
-  return(0.5*(tlns+trns));
-}
+
 
 void R3BSofSciTcal2SingleTcal::FinishEvent()
 {

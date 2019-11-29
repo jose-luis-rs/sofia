@@ -1,4 +1,4 @@
-#include "R3BSofSciSingleTcalPar.h"
+#include "R3BSofSciRawPosPar.h"
 
 #include "FairLogger.h"
 #include "FairParamList.h"
@@ -9,43 +9,44 @@
 
 #include <iostream>
 
-#define MAX_SINGLETCALPAR 4
+#define MAX_RAWPOSPAR 2
 
 using std::cout;
 using std::endl;
 
 // ---- Standard Constructor ---------------------------------------------------
-R3BSofSciSingleTcalPar::R3BSofSciSingleTcalPar(const char* name, const char* title, const char* context)
+R3BSofSciRawPosPar::R3BSofSciRawPosPar(const char* name, const char* title, const char* context)
   : FairParGenericSet(name, title, context)
   , fNumDetectors(0)
+  , fNumChannels(0)
   , fNumSignals(0)
   , fNumParsPerSignal(0)
 {
-  fAllSignalsSingleTcalParams = new TArrayF(MAX_SINGLETCALPAR);
+  fAllSignalsRawPosParams = new TArrayF(MAX_SINGLETCALPAR);
 }
 
 // ----  Destructor ------------------------------------------------------------
-R3BSofSciSingleTcalPar::~R3BSofSciSingleTcalPar()
+R3BSofSciRawPosPar::~R3BSofSciRawPosPar()
 {
     clear();
-    if (fAllSignalsSingleTcalParams)
+    if (fAllSignalsRawPosParams)
     {
-        delete fAllSignalsSingleTcalParams;
-        fAllSignalsSingleTcalParams == NULL;
+        delete fAllSignalsRawPosParams;
+        fAllSignalsRawPosParams == NULL;
     }
 }
 
 // ----  Method clear ----------------------------------------------------------
-void R3BSofSciSingleTcalPar::clear()
+void R3BSofSciRawPosPar::clear()
 {
     status = kFALSE;
     resetInputVersions();
 }
 
 // ----  Method putParams ------------------------------------------------------
-void R3BSofSciSingleTcalPar::putParams(FairParamList* list)
+void R3BSofSciRawPosPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BSofSciSingleTcalPar::putParams() called";
+    LOG(INFO) << "R3BSofSciRawPosPar::putParams() called";
     if (!list)
     {
         return;
@@ -54,42 +55,47 @@ void R3BSofSciSingleTcalPar::putParams(FairParamList* list)
     Int_t array_size = fNumSignals * fNumParsPerSignal;
     LOG(INFO) << "Array Size: " << array_size;
 
-    fAllSignalsSingleTcalParams->Set(array_size);
+    fAllSignalsRawPosParams->Set(array_size);
 
-    list->add("SingleTcalPar", *fAllSignalsSingleTcalParams);
-    list->add("nDetectorsSingleTcalPar", fNumDetectors);
-    list->add("nSignalsSingleTcalPar", fNumSignals);
-    list->add("nSingleTcalParsPerSignal", fNumParsPerSignal);
+    list->add("RawPosPar", *fAllSignalsRawPosParams);
+    list->add("nDetectorsRawPosPar", fNumDetectors);
+    list->add("nChannelsRawPosPar", fNumChannels);
+    list->add("nSignalsRawPosPar", fNumSignals);
+    list->add("nRawPosParsPerSignal", fNumParsPerSignal);
 }
 
 // ----  Method getParams ------------------------------------------------------
-Bool_t R3BSofSciSingleTcalPar::getParams(FairParamList* list)
+Bool_t R3BSofSciRawPosPar::getParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BSofSciSingleTcalPar::getParams() called";
+    LOG(INFO) << "R3BSofSciRawPosPar::getParams() called";
     if (!list)
     {
         return kFALSE;
     }
-    if (!list->fill("nDetectorsSingleTcalPar", &fNumDetectors))
+    if (!list->fill("nDetectorsRawPosPar", &fNumDetectors))
     {
         return kFALSE;
     }
-    if (!list->fill("nSignalsSingleTcalPar", &fNumSignals))
+    if (!list->fill("nChannelsRawPosPar", &fNumDetectors))
     {
         return kFALSE;
     }
-    if (!list->fill("nSingleTcalParsPerSignal", &fNumParsPerSignal))
+    if (!list->fill("nSignalsRawPosPar", &fNumSignals))
+    {
+        return kFALSE;
+    }
+    if (!list->fill("nRawPosParsPerSignal", &fNumParsPerSignal))
     {
         return kFALSE;
     }
 
     Int_t array_size = fNumSignals * fNumParsPerSignal;
     LOG(INFO) << "Array Size: " << array_size;
-    fAllSignalsSingleTcalParams->Set(array_size);
+    fAllSignalsRawPosParams->Set(array_size);
 
-    if (!(list->fill("SingleTcalPar", fAllSignalsSingleTcalParams)))
+    if (!(list->fill("RawPosPar", fAllSignalsRawPosParams)))
     {
-        LOG(INFO) << "---Could not initialize fAllSignalsSingleTcalParams";
+        LOG(INFO) << "---Could not initialize fAllSignalsRawPosParams";
         return kFALSE;
     }
 
@@ -97,9 +103,9 @@ Bool_t R3BSofSciSingleTcalPar::getParams(FairParamList* list)
 }
 
 // ----  Method printParams ----------------------------------------------------
-void R3BSofSciSingleTcalPar::printParams()
+void R3BSofSciRawPosPar::printParams()
 {
-    LOG(INFO) << "R3BSofSciSingleTcalPar: SofSciSingleTcal Parameters: ";
+    LOG(INFO) << "R3BSofSciRawPosPar: SofSciRawPos Parameters: ";
     Int_t array_size = fNumSignals * fNumParsPerSignal;
 
     cout << "--- --------------------------------------------" << endl;
@@ -107,6 +113,6 @@ void R3BSofSciSingleTcalPar::printParams()
     cout << "--- --------------------------------------------" << endl;
     for (Int_t param=0; param < array_size; param++)
       {
-	cout << "LIMIT " << param << " = " << fAllSignalsSingleTcalParams->GetAt(param) << endl;
+	cout << "LIMIT " << param << " = " << fAllSignalsRawPosParams->GetAt(param) << endl;
       }
 }

@@ -13,7 +13,6 @@
 #pragma link C++ class R3BSofSciSingleTcalPar+;
 
 #pragma link C++ class R3BSofSciTcal2SingleTcalPar+;
-#pragma link C++ class R3BSofSciTcal2SingleTcal+;
 
 
 #endif

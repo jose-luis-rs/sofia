@@ -1,7 +1,7 @@
-#include "R3BSofSciTcal2SingleTcalPar.h"
+#include "R3BSofSciTcal2RawPosPar.h"
 
 #include "R3BSofSciTcalData.h"
-#include "R3BSofSciSingleTcalPar.h"
+#include "R3BSofSciRawPosPar.h"
 
 #include "R3BEventHeader.h"
 
@@ -49,43 +49,44 @@
 // *** ******************************************* *** //
 
 
-//R3BSofSciTcal2SingleTcalPar: Default Constructor --------------------------
-R3BSofSciTcal2SingleTcalPar::R3BSofSciTcal2SingleTcalPar() 
-  : FairTask("R3BSofSciTcal2SingleTcalPar",1)
+//R3BSofSciTcal2RawPosPar: Default Constructor --------------------------
+R3BSofSciTcal2RawPosPar::R3BSofSciTcal2RawPosPar() 
+  : FairTask("R3BSofSciTcal2RawPosPar",1)
   , fNumDetectors(NUMBER_OF_DETECTORS)
+  , fNumChannels(NUMBER_OF_CHANNELS)
   , fNumSignals(NUMBER_OF_SIGNALS)
   , fNumParsPerSignal(2)
   , fMinStatistics(0)
   , fTcal(NULL)
-  , fSingleTcalPar(NULL)
+  , fRawPosPar(NULL)
   , fOutputFile(NULL) 
 {
 }
 
-//R3BSofSciTcal2SingleTcalPar: Standard Constructor --------------------------
-R3BSofSciTcal2SingleTcalPar::R3BSofSciTcal2SingleTcalPar(const char* name, Int_t iVerbose) 
+//R3BSofSciTcal2RawPosPar: Standard Constructor --------------------------
+R3BSofSciTcal2RawPosPar::R3BSofSciTcal2RawPosPar(const char* name, Int_t iVerbose) 
   : FairTask(name, iVerbose)
   , fNumDetectors(NUMBER_OF_DETECTORS)
   , fNumSignals(NUMBER_OF_SIGNALS)
   , fNumParsPerSignal(2)
   , fMinStatistics(0)
   , fTcal(NULL)
-  , fSingleTcalPar(NULL)
+  , fRawPosPar(NULL)
   , fOutputFile(NULL) 
 
 {
 }
 
-//R3BSofSciTcal2SingleTcalPar: Destructor ----------------------------------------
-R3BSofSciTcal2SingleTcalPar::~R3BSofSciTcal2SingleTcalPar() 
+//R3BSofSciTcal2RawPosPar: Destructor ----------------------------------------
+R3BSofSciTcal2RawPosPar::~R3BSofSciTcal2RawPosPar() 
 {
-  if(fSingleTcalPar) delete fSingleTcalPar;
+  if(fRawPosPar) delete fRawPosPar;
 }
 
 // -----   Public method Init   --------------------------------------------
-InitStatus R3BSofSciTcal2SingleTcalPar::Init() {
+InitStatus R3BSofSciTcal2RawPosPar::Init() {
 
-  LOG(INFO) << "R3BSofSciTcal2SingleTcalPar: Init";
+  LOG(INFO) << "R3BSofSciTcal2RawPosPar: Init";
 
   FairRootManager* rm = FairRootManager::Instance();
   if (!rm) { return kFATAL;}
@@ -97,7 +98,7 @@ InitStatus R3BSofSciTcal2SingleTcalPar::Init() {
   // scintillator at S2 and cave C
   fTcal = (TClonesArray*)rm->GetObject("SofSciTcalData");      
   if (!fTcal){
-    LOG(ERROR)<<"R3BSofSciTcal2SingleTcalPar::Init() Couldn't get handle on SofSciTcalData container";
+    LOG(ERROR)<<"R3BSofSciTcal2RawPosPar::Init() Couldn't get handle on SofSciTcalData container";
     return kFATAL;
   }
 
@@ -109,9 +110,9 @@ InitStatus R3BSofSciTcal2SingleTcalPar::Init() {
   FairRuntimeDb* rtdb = FairRuntimeDb::instance();
   if (!rtdb) { return kFATAL;}  
 
-  fSingleTcalPar=(R3BSofSciSingleTcalPar*)rtdb->getContainer("SofSciSingleTcalPar");
-  if (!fSingleTcalPar) {
-    LOG(ERROR)<<"R3BSofSciTcal2SingleTcalPar::Init() Couldn't get handle on SofSciSingleTcalPar container";
+  fRawPosPar=(R3BSofSciRawPosPar*)rtdb->getContainer("SofSciRawPosPar");
+  if (!fRawPosPar) {
+    LOG(ERROR)<<"R3BSofSciTcal2RawPosPar::Init() Couldn't get handle on SofSciRawPosPar container";
     return kFATAL;
   }
 
@@ -134,47 +135,14 @@ InitStatus R3BSofSciTcal2SingleTcalPar::Init() {
 }
 
 // -----   Public method ReInit   --------------------------------------------
-InitStatus R3BSofSciTcal2SingleTcalPar::ReInit() {
+InitStatus R3BSofSciTcal2RawPosPar::ReInit() {
   
   
   return kSUCCESS;
 }
 
 // -----   Public method Exec   --------------------------------------------
-void R3BSofSciTcal2SingleTcalPar::Exec(Option_t* opt) {
-  ExecRawPos();
-  // TO DO AND SHOULD BE IN #define #else #endif  ON NUMBER_OF_DETECTORS CASE : ExecRawPos();
-}
-
-
-// ---- Public method Reset   --------------------------------------------------
-void R3BSofSciTcal2SingleTcalPar::Reset() 
-{
-}
-
-void R3BSofSciTcal2SingleTcalPar::FinishEvent() 
-{
-}
-
-// ---- Public method Finish   --------------------------------------------------
-void R3BSofSciTcal2SingleTcalPar::FinishTask() 
-{  
-  CalculateRawPosSingleTcalParams();
-  // TO DO AND SHOULD BE IN #define #else #endif  ON NUMBER_OF_DETECTORS CASE : CalculateRawTofSingleTcalParams();
-  fSingleTcalPar->printParams();
-}
-
-
-
-
-
-
-// --- -------------------------- --- //
-// --- WHEN NO SCINTILLATOR AT S2 --- //
-// --- -------------------------- --- //
-
-// ----------------------------------------------------------
-void R3BSofSciTcal2SingleTcalPar::ExecRawPos() {
+void R3BSofSciTcal2RawPosPar::Exec(Option_t* opt) {
 
   // --- ------------------------------ --- //
   // --- LOOP OVER TCAL HITS FOR SofSci --- //
@@ -198,7 +166,7 @@ void R3BSofSciTcal2SingleTcalPar::ExecRawPos() {
   for (UInt_t ihit=0; ihit<nHitsSci; ihit++){
     R3BSofSciTcalData* hitSci = (R3BSofSciTcalData*)fTcal->At(ihit);
     if (!hitSci){
-      LOG(WARNING) << "R3BSofSciTcal2SingleTcalPar::Exec() : could not get hitSci";
+      LOG(WARNING) << "R3BSofSciTcal2RawPosPar::Exec() : could not get hitSci";
       continue; // should not happen
     }           
     iDet = hitSci->GetDetector()-1; // get the 0 based Det number
@@ -216,14 +184,33 @@ void R3BSofSciTcal2SingleTcalPar::ExecRawPos() {
   }
 }
 
-// ------------------------------
-void R3BSofSciTcal2SingleTcalPar::CalculateRawPosSingleTcalParams()
+
+// ---- Public method Reset   --------------------------------------------------
+void R3BSofSciTcal2RawPosPar::Reset() 
 {
-  LOG(INFO) << "R3BSofSciTcal2SingleTcalPar: CalculateRawPosSingleTcalParams()";
+}
+
+void R3BSofSciTcal2RawPosPar::FinishEvent() 
+{
+}
+
+// ---- Public method Finish   --------------------------------------------------
+void R3BSofSciTcal2RawPosPar::FinishTask() 
+{  
+  CalculateRawPosRawPosParams();
+  // TO DO AND SHOULD BE IN #define #else #endif  ON NUMBER_OF_DETECTORS CASE : CalculateRawTofRawPosParams();
+  fRawPosPar->printParams();
+}
+
+
+// ------------------------------
+void R3BSofSciTcal2RawPosPar::CalculateRawPosRawPosParams()
+{
+  LOG(INFO) << "R3BSofSciTcal2RawPosPar: CalculateRawPosRawPosParams()";
   
-  fSingleTcalPar->SetNumDetectors(fNumDetectors);
-  fSingleTcalPar->SetNumSignals(fNumDetectors);
-  fSingleTcalPar->SetNumParsPerSignal(fNumParsPerSignal);
+  fRawPosPar->SetNumDetectors(fNumDetectors);
+  fRawPosPar->SetNumSignals(fNumDetectors);
+  fRawPosPar->SetNumParsPerSignal(fNumParsPerSignal);
 
   Double_t iMax;
   Int_t bin, binLimit; 
@@ -237,7 +224,7 @@ void R3BSofSciTcal2SingleTcalPar::CalculateRawPosSingleTcalParams()
 	if(fh_RawPosMult1[sig]->GetBinContent(bin)>(iMax/10000.)) binLimit=bin;
 	bin++;
       }
-      fSingleTcalPar->SetSignalParams(fh_RawPosMult1[sig]->GetBinLowEdge(binLimit),sig*2);
+      fRawPosPar->SetSignalParams(fh_RawPosMult1[sig]->GetBinLowEdge(binLimit),sig*2);
       //HIGHER LIMIT
       bin=fh_RawPosMult1[sig]->GetNbinsX();
       binLimit=fh_RawPosMult1[sig]->GetNbinsX();
@@ -245,32 +232,16 @@ void R3BSofSciTcal2SingleTcalPar::CalculateRawPosSingleTcalParams()
 	if(fh_RawPosMult1[sig]->GetBinContent(bin)>(iMax/10000.)) binLimit=bin;
 	bin--;
       }
-      fSingleTcalPar->SetSignalParams(fh_RawPosMult1[sig]->GetBinLowEdge(binLimit),sig*2+1);
+      fRawPosPar->SetSignalParams(fh_RawPosMult1[sig]->GetBinLowEdge(binLimit),sig*2+1);
     }
     fh_RawPosMult1[sig]->Write();
   }
 
-  fSingleTcalPar->setChanged();
+  fRawPosPar->setChanged();
   return;
   
 }
 
 
-// --- ----------------------- --- //
-// --- WHEN SCINTILLATOR AT S2 --- //
-// --- ----------------------- --- //
-
-// ----------------------------------------------------------
-void R3BSofSciTcal2SingleTcalPar::ExecRawTof() 
-{
-  // TO DO 
-}
-// ------------------------------
-void R3BSofSciTcal2SingleTcalPar::CalculateRawTofSingleTcalParams()
-{
-  LOG(INFO) << "R3BSofSciTcal2SingleTcalPar: CalculateRawTofSingleTcalParams()";
-  // TO DO 
-}
-
-ClassImp(R3BSofSciTcal2SingleTcalPar)
+ClassImp(R3BSofSciTcal2RawPosPar)
   
