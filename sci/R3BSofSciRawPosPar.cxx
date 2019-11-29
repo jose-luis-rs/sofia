@@ -22,7 +22,7 @@ R3BSofSciRawPosPar::R3BSofSciRawPosPar(const char* name, const char* title, cons
   , fNumSignals(0)
   , fNumParsPerSignal(0)
 {
-  fAllSignalsRawPosParams = new TArrayF(MAX_SINGLETCALPAR);
+  fAllSignalsRawPosParams = new TArrayF(MAX_RAWPOSPAR);
 }
 
 // ----  Destructor ------------------------------------------------------------

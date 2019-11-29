@@ -63,7 +63,7 @@ class R3BSofSciTcal2RawPosPar : public FairTask {
   void SetNumChannels(Int_t n)    {fNumChannels=n;}  
   void SetNumSignals(){
     if(fNumDetectors)    fNumSignals=fNumDetectors;
-    else LOG(ERROR) << "R3BSofSciTcal2RawPosPar; cannot defined fNumSignals without fNumDetectors";
+    //else LOG(ERROR) << "R3BSofSciTcal2RawPosPar; cannot defined fNumSignals without fNumDetectors";
   }
   void SetNumParsPerSignal(Int_t n) {
     fNumParsPerSignal=n;

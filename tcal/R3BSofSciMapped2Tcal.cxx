@@ -31,11 +31,9 @@ R3BSofSciMapped2Tcal::~R3BSofSciMapped2Tcal()
   LOG(INFO) << "R3BSofSciMapped2Tcal: Delete instance";
   if(fMapped){
     delete fMapped;
-    fMapped=NULL;
   }
   if(fTcal){
     delete fTcal;
-    fTcal=NULL;
   }
 }
 

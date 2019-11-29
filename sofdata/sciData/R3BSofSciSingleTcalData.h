@@ -12,17 +12,17 @@ class R3BSofSciSingleTcalData : public TObject
     R3BSofSciSingleTcalData();
 
     // Standard Constructor
-    R3BSofSciSingleTcalData(UShort_t detector, Double_t left_traw, Double_t right_traw, Double_t mean_traw, Double_t posraw);
+    R3BSofSciSingleTcalData(UShort_t detector);
 
     // Destructor
     virtual ~R3BSofSciSingleTcalData() {}
 
     // Getters
-    inline const UShort_t& GetNumberOfDetectors()  const { return fNumberOfDetectors; }
-    inline const Double_t& GetRawTimeNs(det)       const { return fRawTimeNs[det-1]; }
-    inline const Double_t& GetRawPosNs(det)        const { return fRawPosNs[det-1]; }
+    inline const UShort_t& GetNumberOfDetectors()           const { return fNumberOfDetectors; }
+    inline const Double_t& GetRawTimeNs(UShort_t det)       const { return fRawTimeNs[det-1]; }
+    inline const Double_t& GetRawPosNs(UShort_t det)        const { return fRawPosNs[det-1]; }
 #if NUMBER_OF_DETECTORS==2
-    inline const Double_t& GetRawTofNs()           const { return fRawTofNs;}
+    inline const Double_t& GetRawTofNs()                    const { return fRawTofNs;}
 #endif
 
     // Modifiers

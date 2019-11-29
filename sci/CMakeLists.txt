@@ -30,8 +30,8 @@ link_directories( ${LINK_DIRECTORIES})
 set(SRCS
 #Put here your sourcefiles
 R3BSofSciContFact.cxx
-R3BSofSciSingleTcalPar.cxx
-R3BSofSciTcal2SingleTcalPar.cxx
+R3BSofSciRawPosPar.cxx
+R3BSofSciTcal2RawPosPar.cxx
 )
 
 # fill list of header files from list of source files
