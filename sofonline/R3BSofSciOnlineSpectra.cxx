@@ -10,6 +10,7 @@
 #include "R3BSofSciOnlineSpectra.h"
 #include "R3BEventHeader.h"
 #include "R3BSofSciMappedData.h"
+#include "R3BSofSciTcalData.h"
 #include "THttpServer.h"
 
 #include "FairLogger.h"
@@ -39,6 +40,7 @@
 R3BSofSciOnlineSpectra::R3BSofSciOnlineSpectra()
     : FairTask("SofSciOnlineSpectra", 1)
     , fMappedItemsSci(NULL)
+    , fTcalItemsSci(NULL)
     , fNEvents(0)
 {
 }
@@ -46,6 +48,7 @@ R3BSofSciOnlineSpectra::R3BSofSciOnlineSpectra()
 R3BSofSciOnlineSpectra::R3BSofSciOnlineSpectra(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fMappedItemsSci(NULL)
+    , fTcalItemsSci(NULL)
     , fNEvents(0)
 {
 }
@@ -53,8 +56,10 @@ R3BSofSciOnlineSpectra::R3BSofSciOnlineSpectra(const char* name, Int_t iVerbose)
 R3BSofSciOnlineSpectra::~R3BSofSciOnlineSpectra()
 {
     LOG(INFO) << "R3BSofSciOnlineSpectra::Delete instance";
-    if (fMappedItemsSci)
-        delete fMappedItemsSci;
+    if (fMappedItemsSci)        
+      delete fMappedItemsSci;
+    if (fTcalItemsSci)        
+      delete fTcalItemsSci;
 }
 
 InitStatus R3BSofSciOnlineSpectra::Init()
@@ -73,18 +78,33 @@ InitStatus R3BSofSciOnlineSpectra::Init()
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 
-    // get access to mapped data of the TWIM
+    // --- ------------------------------------ --- //
+    // --- get access to mapped data of the SCI --- //
+    // --- ------------------------------------ --- //
     fMappedItemsSci = (TClonesArray*)mgr->GetObject("SofSciMappedData");
     if (!fMappedItemsSci)
     {
         return kFATAL;
     }
 
-    // Create histograms for detectors
+    // --- ---------------------------------- --- //
+    // --- get access to tcal data of the SCI --- //
+    // --- ---------------------------------- --- //
+    fTcalItemsSci = (TClonesArray*)mgr->GetObject("SofSciTcalData");
+    if (!fTcalItemsSci)
+    {
+        return kFATAL;
+    }
+
+    // --- ------------------------------- --- //
+    // --- Create histograms for detectors --- //
+    // --- ------------------------------- --- //
     char Name1[255];
     char Name2[255];
 
     for (Int_t i = 0; i < NbDetectors; i++)    {
+
+      // === FINE TIME AND MULT === //
       sprintf(Name1, "SofSci%i_MultAndFt",i+1);
       cSciMult[i] = new TCanvas(Name1, Name1, 10, 10, 800, 700);
       cSciMult[i]->Divide(4, 4);
@@ -96,12 +116,24 @@ InitStatus R3BSofSciOnlineSpectra::Init()
       }
       sprintf(Name1,"SofSci%i_MultPerChannel",i+1);
       fh2_mult[i] = new TH2I(Name1,Name1,NbChannels+1,0,NbChannels+1,20,0,20);
+
+      // === RAW POSITION === //
+      sprintf(Name1,"SofSci%i_RawPos",i+1);
+      cSciRawPos[i] = new TCanvas(Name1, Name1, 10, 10, 500, 500);
+      sprintf(Name1,"SofSci%i_RawPosAtTcal_Mult1",i+1);
+      fh1_RawPos_AtTcalMult1[i] = new TH1F(Name1,Name1,1000,-5,5);
+      cSciMult[i]->cd();
+      fh1_RawPos_AtTcalMult1[i]->Draw("");
     }
 
-    // MAIN FOLDER-Sci
+    // --- --------------- --- //
+    // --- MAIN FOLDER-Sci --- //
+    // --- --------------- --- //
     TFolder* mainfolSci = new TFolder("SOFSCI", "SOFSCI info");
-    for (Int_t i = 0; i < NbDetectors; i++)
+    for (Int_t i = 0; i < NbDetectors; i++){
         mainfolSci->Add(cSciMult[i]);
+        mainfolSci->Add(cSciRawPos[i]);
+    }
     run->AddObject(mainfolSci);
 
     // Register command to reset histograms
@@ -113,14 +145,14 @@ InitStatus R3BSofSciOnlineSpectra::Init()
 void R3BSofSciOnlineSpectra::Reset_Histo()
 {
     LOG(INFO) << "R3BSofSciOnlineSpectra::Reset_Histo";
-    // Mapped data
-    for (Int_t i = 0; i < NbDetectors; i++)
-    {
-        fh2_mult[i]->Reset();
-        for (Int_t j = 0; j < NbChannels; j++)
-        {
-            fh1_finetime[i*NbChannels+j]->Reset();
-        }
+    for (Int_t i = 0; i < NbDetectors; i++){
+      // === MULT AND FINE TIME === //
+      fh2_mult[i]->Reset();
+      for (Int_t j = 0; j < NbChannels; j++){
+	fh1_finetime[i*NbChannels+j]->Reset();
+      }
+      // === RAW POSITION === //
+      fh1_RawPos_AtTcalMult1[i]->Reset();
     }
 }
 
@@ -130,28 +162,59 @@ void R3BSofSciOnlineSpectra::Exec(Option_t* option)
     if (NULL == mgr)
         LOG(FATAL) << "R3BSofSciOnlineSpectra::Exec FairRootManager not found";
 
-    // Fill mapped data
-    if (fMappedItemsSci && fMappedItemsSci->GetEntriesFast()){
-      Int_t nHits = fMappedItemsSci->GetEntriesFast();
-      UShort_t iDet; // 0-bsed
-      UShort_t iCh;  // 0-based
-      UShort_t mult[NbDetectors*NbChannels];
-      for(UShort_t i=0; i<NbDetectors; i++){
-	for(UShort_t j=0; j<NbChannels; j++){
-	  mult[i*NbChannels+j]=0;
-	}
+    Int_t    nHits;
+    UShort_t iDet; // 0-bsed
+    UShort_t iCh;  // 0-based
+    Double_t iRawTimeNs[NbDetectors*2];
+    UShort_t mult[NbDetectors*NbChannels];
+
+    // --- -------------- --- //
+    // --- initialisation --- //
+    // --- -------------- --- //
+    for(UShort_t i=0; i<NbDetectors; i++){
+      for(UShort_t j=0; j<NbChannels; j++){
+	mult[i*NbChannels+j]=0;
       }
+    }
+
+    if (fMappedItemsSci && fMappedItemsSci->GetEntriesFast() &&
+	fTcalItemsSci   && fTcalItemsSci->GetEntriesFast()){
+
+      // --- --------------------- --- //
+      // --- loop over mapped data --- //
+      // --- --------------------- --- //
+      nHits = fMappedItemsSci->GetEntriesFast();
       for (Int_t ihit = 0; ihit < nHits; ihit++){
-	R3BSofSciMappedData* hit = (R3BSofSciMappedData*)fMappedItemsSci->At(ihit);
-	if (!hit) continue;
-	iDet = hit->GetDetector()-1;
-	iCh  = hit->GetPmt()-1;
+	R3BSofSciMappedData* hitmapped = (R3BSofSciMappedData*)fMappedItemsSci->At(ihit);
+	if (!hitmapped) continue;
+	iDet = hitmapped->GetDetector()-1;
+	iCh  = hitmapped->GetPmt()-1;
 	mult[iDet*NbChannels+iCh]++;
-	fh1_finetime[iDet*NbChannels+iCh]->Fill(hit->GetTimeFine());
+	fh1_finetime[iDet*NbChannels+iCh]->Fill(hitmapped->GetTimeFine());
       }
+
+      // --- ------------------- --- //
+      // --- loop over tcal data --- //
+      // --- ------------------- --- //
+      nHits = fTcalItemsSci->GetEntriesFast();
+      for (Int_t ihit = 0; ihit < nHits; ihit++){
+	R3BSofSciTcalData* hittcal = (R3BSofSciTcalData*)fTcalItemsSci->At(ihit);
+	if (!hittcal) continue;
+	if(hittcal->GetPmt()==3) continue;
+	iDet = hittcal->GetDetector()-1; 
+	iCh  = hittcal->GetPmt()-1;      
+	iRawTimeNs[iDet*2+iCh] = hittcal->GetRawTimeNs();;
+      } 
+     
+      // --- ----------------------------------------- --- //
+      // --- filling some histogramms outside the loop --- //
+      // --- ----------------------------------------- --- //
       for(UShort_t i=0; i<NbDetectors; i++){
 	for(UShort_t j=0; j<NbChannels; j++){
 	  fh2_mult[i]->Fill(j+1,mult[i*NbChannels+j]);
+	}
+	if((mult[iDet*NbChannels]==1)&&(mult[iDet*NbChannels+1]==1)){
+	  fh1_RawPos_AtTcalMult1[i]->Fill(iRawTimeNs[i*2+1]-iRawTimeNs[i*2]);
 	}
       }
     }
@@ -162,6 +225,9 @@ void R3BSofSciOnlineSpectra::FinishEvent()
 {
     if (fMappedItemsSci){
       fMappedItemsSci->Clear();
+    }
+    if (fTcalItemsSci){
+      fTcalItemsSci->Clear();
     }
 }
 
@@ -178,6 +244,15 @@ void R3BSofSciOnlineSpectra::FinishTask()
       }
     }
   }
+
+  if (fTcalItemsSci){
+    for (UShort_t i = 0; i < NbDetectors; i++){
+      fh1_RawPos_AtTcalMult1[i]->Write();
+      cSciRawPos[i]->Write();
+    }
+  }
+
+
 }
 
  ClassImp(R3BSofSciOnlineSpectra)

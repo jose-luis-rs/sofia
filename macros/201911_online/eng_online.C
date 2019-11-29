@@ -85,6 +85,10 @@ void eng_online()
   // Runtime data base ------------------------------------ 
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
 
+  FairParAsciiFileIo* parIo1 = new FairParAsciiFileIo();//Ascii
+  parIo1->open("./parameters/CalibParam.par","in");
+  rtdb->setFirstInput(parIo1);
+  rtdb->print();
 
   // Add analysis task ------------------------------------
 
@@ -121,13 +125,6 @@ void eng_online()
   R3BSofToFWMapped2Tcal* SofToFWMap2Tcal = new R3BSofToFWMapped2Tcal();
   run->AddTask(SofToFWMap2Tcal);
   
-
-  FairParAsciiFileIo* parIo1 = new FairParAsciiFileIo();//Ascii
-  parIo1->open("./parameters/CalibParam.par","in");
-  rtdb->setFirstInput(parIo1);
-  rtdb->print();
-
-
   // Add online task ------------------------------------
   //R3BSofAtOnlineSpectra* atonline= new R3BSofAtOnlineSpectra();
   //run->AddTask(atonline);
@@ -142,7 +139,7 @@ void eng_online()
   run->AddTask(mw2online);
   //R3BSofMwpcOnlineSpectra* mw3online= new R3BSofMwpcOnlineSpectra("SofMwpc3OnlineSpectra",1,"Mwpc3");
   //run->AddTask(mw3online);
-  R3BSofSciOnlineSpectra* scionline= new R3BSofSciOnlineSpectra("SofSciOnlineSpectra",1,"Sci");
+  R3BSofSciOnlineSpectra* scionline= new R3BSofSciOnlineSpectra();
   run->AddTask(scionline);
 
   R3BSofOnlineSpectra* sofonline= new R3BSofOnlineSpectra();

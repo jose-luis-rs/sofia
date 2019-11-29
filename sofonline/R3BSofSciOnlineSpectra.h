@@ -85,6 +85,7 @@ class R3BSofSciOnlineSpectra : public FairTask
 
   private:
     TClonesArray* fMappedItemsSci; /**< Array with mapped items. */
+    TClonesArray* fTcalItemsSci; /**< Array with mapped items. */
 
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header.      */
@@ -92,11 +93,14 @@ class R3BSofSciOnlineSpectra : public FairTask
 
     // Canvas
     TCanvas* cSciMult[NbDetectors];
+    TCanvas* cSciRawPos[NbDetectors];
 
     // Histograms for Mapped data
     TH1I* fh1_finetime[NbDetectors*NbChannels];
     TH2I* fh2_mult[NbDetectors];
 
+    // Histograms for Tcal data
+    TH1F * fh1_RawPos_AtTcalMult1[NbDetectors];
 
   public:
     ClassDef(R3BSofSciOnlineSpectra, 1)
