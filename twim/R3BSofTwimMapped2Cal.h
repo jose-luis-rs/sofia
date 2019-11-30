@@ -56,7 +56,7 @@ class R3BSofTwimMapped2Cal : public FairTask
     UShort_t NumAnodes;
     UShort_t NumParams;
     TArrayF* CalParams;
-    Int_t fE[16*4],fDT[16*4];
+    Int_t fE[16 * 4], fDT[16 * 4];
 
     Bool_t fOnline; // Don't store data for online
 

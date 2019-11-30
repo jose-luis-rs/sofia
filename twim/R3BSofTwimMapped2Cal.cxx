@@ -24,7 +24,7 @@
 
 // R3BSofTwimMapped2Cal: Default Constructor --------------------------
 R3BSofTwimMapped2Cal::R3BSofTwimMapped2Cal()
-    : FairTask("R3B TWIM Calibrator", 1)
+    : FairTask("R3BSof Twim Cal Calibrator", 1)
     , NumSec(1)
     , NumAnodes(16)
     , NumParams(0)
@@ -167,9 +167,10 @@ void R3BSofTwimMapped2Cal::Exec(Option_t* option)
     Double_t pedestal = 0.;
     Double_t dtime = 0.;
 
-    for (Int_t i = 0; i < NumAnodes+NumSec; i++){
-       fE[i]=0.;
-       fDT[i]=0.;
+    for (Int_t i = 0; i < NumAnodes + NumSec; i++)
+    {
+        fE[i] = 0.;
+        fDT[i] = 0.;
     }
 
     for (Int_t i = 0; i < nHits; i++)
@@ -177,11 +178,13 @@ void R3BSofTwimMapped2Cal::Exec(Option_t* option)
         mappedData[i] = (R3BSofTwimMappedData*)(fTwimMappedDataCA->At(i));
         secId = mappedData[i]->GetSecID();
         anodeId = mappedData[i]->GetAnodeID();
-        energy = mappedData[i]->GetEnergy() - pedestal;//FIXME
+        energy = mappedData[i]->GetEnergy() - pedestal; // FIXME
         dtime = mappedData[i]->GetTime();
-    
-        if(fDT[anodeId]==0)fDT[anodeId]=dtime; //mult=1
-        if(fE[anodeId]==0)fE[anodeId]=energy;  //mult=1
+
+        if (fDT[anodeId] == 0)
+            fDT[anodeId] = dtime; // mult=1
+        if (fE[anodeId] == 0)
+            fE[anodeId] = energy; // mult=1
     }
 
     for (Int_t i = 0; i < NumAnodes; i++)
@@ -189,7 +192,7 @@ void R3BSofTwimMapped2Cal::Exec(Option_t* option)
         // We accept the hit if the energy is larger than zero
         if (fE[i] > 0)
         {
-            AddCalData(0, i, fDT[i]-fDT[NumAnodes], fE[i]);//Only one section
+            AddCalData(0, i, fDT[i] - fDT[NumAnodes], fE[i]); // Only one section
         }
     }
 

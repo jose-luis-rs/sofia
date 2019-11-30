@@ -106,6 +106,9 @@ void eng_online()
   R3BSofTwimMapped2Cal* TwimMap2Cal = new R3BSofTwimMapped2Cal();
   run->AddTask(TwimMap2Cal);
 
+  R3BSofTwimCal2Hit* TwimCal2Hit = new R3BSofTwimCal2Hit();
+  run->AddTask(TwimCal2Hit);
+
   R3BSofMwpc2Mapped2Cal* Map2Cal = new R3BSofMwpc2Mapped2Cal();
   //Map2Cal->SetOnline(true);
   run->AddTask(Map2Cal);
