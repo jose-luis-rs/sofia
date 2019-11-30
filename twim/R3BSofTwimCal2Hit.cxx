@@ -181,21 +181,26 @@ void R3BSofTwimCal2Hit::Exec(Option_t* option)
         energyperanode[secId][anodeId] = CalDat[i]->GetEnergy();
     }
 
-    Double_t nba=0, a0 = 0., a1 = 0., theta = 0., charge = 0.;
+    Double_t nba = 0, a0 = 0., a1 = 0., theta = 0., charge = 0.;
 
     // calculate truncated dE from 16 anodes, Twim-MUSIC
-    for (Int_t i = 0; i <= fNumSec; i++)
+    for (Int_t i = 0; i < fNumSec; i++)
     {
-        for (Int_t j = 0; j <= fNumAnodes; j++)
+        for (Int_t j = 0; j < fNumAnodes; j++)
         {
-            if(energyperanode[i][j]>0.){charge = charge + energyperanode[i][j]; nba++;}
+            if (energyperanode[i][j] > 0.)
+            {
+                charge = charge + energyperanode[i][j];
+                nba++;
+            }
         }
 
-        if (nba>0 && charge/nba > 0.)
+        if (nba > 0 && charge / nba > 0.)
         {
             a0 = CalParams->GetAt(i * fNumParams);
             a1 = CalParams->GetAt(i * fNumParams + 1);
-            if((a0+a1*charge/nba)>0)AddHitData(i, theta, a0+a1*charge/nba);
+            if ((a0 + a1 * charge / nba) > 0)
+                AddHitData(i, theta, a0 + a1 * charge / nba);
         }
     }
 
@@ -210,7 +215,7 @@ void R3BSofTwimCal2Hit::Finish() {}
 // -----   Public method Reset   ------------------------------------------------
 void R3BSofTwimCal2Hit::Reset()
 {
-    LOG(DEBUG) << "Clearing FRSMusicHitData Structure";
+    LOG(DEBUG) << "Clearing TwimHitData Structure";
     if (fTwimHitDataCA)
         fTwimHitDataCA->Clear();
 }

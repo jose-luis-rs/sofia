@@ -92,7 +92,11 @@ void eng_online()
   //Musics
   R3BMusicMapped2Cal* MusMap2Cal = new R3BMusicMapped2Cal();
   //MusMap2Cal->SetOnline(true);
-  //run->AddTask(MusMap2Cal);
+  run->AddTask(MusMap2Cal);
+
+  R3BMusicCal2Hit* MusCal2Hit = new R3BMusicCal2Hit();
+  //MusMap2Cal->SetOnline(true);
+  run->AddTask(MusCal2Hit);
 
   R3BSofMwpc0Mapped2Cal* aMap2Cal = new R3BSofMwpc0Mapped2Cal();
   //Map2Cal->SetOnline(true);

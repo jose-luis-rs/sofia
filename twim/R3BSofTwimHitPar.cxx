@@ -46,7 +46,7 @@ void R3BSofTwimHitPar::putParams(FairParamList* list)
         return;
     }
 
-    Int_t array_size = fNumSec*fNumParamsFit;
+    Int_t array_size = fNumSec * fNumParamsFit;
     LOG(INFO) << "Array Size: " << array_size;
 
     fDetHitParams->Set(array_size);
