@@ -86,11 +86,11 @@ This directory contains all the data containers for the different levels of the 
 
 This directory contains all the readers related to SOFIA detectors :
 
-- R3BSofMwpcReader
-- R3BSofTrimReader
-- R3BSofSciReader
-- R3BSofTwimReader
-- R3BSofToFWReader
+- R3BSofMwpcReader for the MWPC tracking detectors
+- R3BSofTrimReader for the triple ionization chamber
+- R3BSofSciReader for the plastic scintillator located at the FRS and at the entrance of Cave-C (Start)
+- R3BSofTwimReader for the double ionization chamber located in front of target
+- R3BSofToFWReader for the large area ToF-Wall located behind GLAD
 
 and UCESB data structures :
 - ext_h101_sofmwpc.h
