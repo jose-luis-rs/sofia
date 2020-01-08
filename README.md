@@ -76,7 +76,7 @@ root -l sofiahits.root
 
 # Data Analysis (ongoing work)
 
-Data analysis is included inside the sofia directory. You can find the subdirectories:
+Data analysis is included inside the sofia directory. You can find the subdirectories :
 
 ### sofdata
 
@@ -84,22 +84,19 @@ This directory contains all the data containers for the different levels of the 
 
 ### sofsource
 
-This directory contains all the readers related to SOFIA detectors:
----
-R3BSofMwpcReader
-R3BSofTrimReader
-R3BSofSciReader
-R3BSofTwimReader
-R3BSofToFWReader
----
-and UCESB data structures:
----
-ext_h101_sofmwpc.h
-ext_h101_softrim.h
-ext_h101_sofsci.h
-ext_h101_softwim.h
-ext_h101_softofw.h
----
+This directory contains all the readers related to SOFIA detectors :
+
+- R3BSofMwpcReader
+- R3BSofTrimReader
+- R3BSofSciReader
+- R3BSofTwimReader
+- R3BSofToFWReader
+and UCESB data structures :
+- ext_h101_sofmwpc.h
+- ext_h101_softrim.h
+- ext_h101_sofsci.h
+- ext_h101_softwim.h
+- ext_h101_softofw.h
 that allow to get data at mapped level (raw data of each detector).
 
 ### some details of the sofia set-up
