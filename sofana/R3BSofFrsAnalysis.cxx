@@ -178,10 +178,6 @@ InitStatus R3BSofFrsAnalysis::ReInit()
 // -----   Public method Execution   --------------------------------------------
 void R3BSofFrsAnalysis::Exec(Option_t* option)
 {
-
-    // if(++nEvents % 10000 == 0)
-    // LOG(INFO) << nEvents ;
-
     // Reset entries in output arrays, local arrays
     Reset();
 
@@ -218,11 +214,38 @@ void R3BSofFrsAnalysis::Exec(Option_t* option)
         fZ = 0.;
     }
 
-    // Correction for dependence on angle
-    // Add more....
+    // Added initial model
+    double x_pos_s2 = 0.;
+    double x_pos_cave = 0.;
+    double ToF_S2_Cave = 0.;
+    // Position at Cave-C
+    for (Int_t i = 0; i < nHitMwpc; i++)
+    {
+        HitMwpc[i] = (R3BSofMwpcHitData*)(fMwpcHitDataCA->At(i));
+        x_pos_cave = HitMwpc[i]->GetX();
+    }
+    // FIXME: This could need hit level from SCI
+    for (Int_t i = 0; i < nHitSci; i++)
+    {
+        HitSci[i] = (R3BSofSciSingleTcalData*)(fSciHitDataCA->At(i));
+        if (i == 0)
+            x_pos_s2 = HitSci[i]->GetRawPosNs(i + 1);
+        else
+            ToF_S2_Cave = HitSci[i]->GetRawTofNs();
+    }
+
+    // Velocity
+    double Beta_S2_Cave = ((fPathS2Cave / (fTOFS2Cave + ToF_S2_Cave)) * pow(10., 7)) / c;
+    double Gamma_S2_Cave = 1. / (TMath::Sqrt(1. - (Beta_S2_Cave) * (Beta_S2_Cave)));
+
+    // Brho and A/q
+    double Brho_Cave = fBfield_S2_Cave * frho_S2_Cave *
+                       (1. - (((x_pos_cave / 1000.) - fMagS2Cave * (x_pos_s2 / 1000.)) / fDispS2Cave));
+    fAq = (Brho_Cave * e) / (Gamma_S2_Cave * Beta_S2_Cave * c * u);
 
     // Fill the data
-    AddData(fZ + fOffsetZ, fAq + fOffsetAq);
+    if (fZ > 1 && fAq > 0. && Brho_Cave > 0.)
+        AddData(fZ + fOffsetZ, fAq + fOffsetAq, Beta_S2_Cave, Brho_Cave);
 
     if (HitSci)
         delete HitSci;
@@ -245,10 +268,10 @@ void R3BSofFrsAnalysis::Reset()
 }
 
 // -----   Private method AddData  --------------------------------------------
-R3BSofFrsData* R3BSofFrsAnalysis::AddData(Double_t z, Double_t aq)
+R3BSofFrsData* R3BSofFrsAnalysis::AddData(Double_t z, Double_t aq, Double_t beta, Double_t brho)
 {
     // It fills the R3BSofFrsData
     TClonesArray& clref = *fFrsDataCA;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BSofFrsData(z, aq);
+    return new (clref[size]) R3BSofFrsData(z, aq, beta, brho);
 }

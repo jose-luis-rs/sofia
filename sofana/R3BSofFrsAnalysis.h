@@ -75,7 +75,7 @@ class R3BSofFrsAnalysis : public FairTask
 
     /** Private method FrsData **/
     //** Adds a FrsData to the analysis
-    R3BSofFrsData* AddData(Double_t z, Double_t aq);
+    R3BSofFrsData* AddData(Double_t z, Double_t aq, Double_t beta, Double_t brho);
 
   public:
     // Class definition
